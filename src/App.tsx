@@ -1,35 +1,33 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+
+const initialGrid = [
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 0
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 1
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 2
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 3
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 4
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 5
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 6
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 7
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 8
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 9
+  ["false", "false", "false", "false", "false", "false", "false", "false"], // track 10
+];
+
+const track0 = { sound: "kick1.wav", color: "red" };
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [grid, setGrid] = useState(initialGrid);
+  const [currentStep, setCurrentStep] = useState(0);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div style={{ backgroundColor: "var(--background-color)", height: "100vh" }}>
+        <p>test</p>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
