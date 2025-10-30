@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import { Pad } from "./components/pad";
 
 const initialGrid = [
   [false, false, false, false, false, false, false, false], // track 0
@@ -12,23 +13,44 @@ const initialGrid = [
   [false, false, false, false, false, false, false, false], // track 7
   [false, false, false, false, false, false, false, false], // track 8
   [false, false, false, false, false, false, false, false], // track 9
-  [false, false, false, false, false, false, false, false], // track 10
 ];
 
-const track0 = { sound: "kick1.wav", color: "red" };
+const tracks = [
+  { name: "Kick 1", sound: "kick1.wav", color: "kick-pad" },
+  { name: "Kick 2", sound: "kick2.wav", color: "ring" },
+  { name: "Bass 1", sound: "kick2.wav", color: "chart-1" },
+  { name: "Bass 2", sound: "kick2.wav", color: "chart-2" },
+  { name: "Snare 1", sound: "kick2.wav", color: "chart-3" },
+  { name: "Snare 2", sound: "kick2.wav", color: "chart-4" },
+  { name: "Synth 1", sound: "kick2.wav", color: "chart-5" },
+  { name: "Synth 2", sound: "kick2.wav", color: "chart-1" },
+  { name: "HiHat 1", sound: "kick2.wav", color: "secondary" },
+  { name: "HiHat 2", sound: "kick2.wav", color: "secondary" },
+];
 
 function App() {
+  const [bpm, setBpm] = useState(130);
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
 
+  function handleClick(rowIndex: number, colIndex: number) {
+    console.log(`Clicked: row ${rowIndex}, col ${colIndex}`);
+  }
+
   return (
-    <>
-      <div style={{ backgroundColor: "var(--background-color)", height: "100vh" }}>
-        <p>test</p>
-        <div>{}</div>
-      </div>
-    </>
+    <div className="min-h-screen bg-gray-900 items-center justify-center grid grid-cols-8 gap-2">
+      {initialGrid.map((track, rowIndex) => {
+        return track.map((_, colIndex) => {
+          return (
+            <Pad
+              color="bg-red-500"
+              isActive={true}
+              onClick={() => handleClick(rowIndex, colIndex)}
+            />
+          );
+        });
+      })}
+    </div>
   );
 }
-
 export default App;
