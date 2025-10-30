@@ -38,18 +38,24 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 items-center justify-center grid grid-cols-8 gap-2">
-      {initialGrid.map((track, rowIndex) => {
-        return track.map((_, colIndex) => {
-          return (
-            <Pad
-              color="bg-red-500"
-              isActive={true}
-              onClick={() => handleClick(rowIndex, colIndex)}
-            />
-          );
-        });
-      })}
+    // outer container
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="border-10 border-gray-700">
+        {/* beat grid */}
+        <div className="grid grid-cols-8 gap-2">
+          {initialGrid.map((track, rowIndex) => {
+            return track.map((_, colIndex) => {
+              return (
+                <Pad
+                  color="bg-red-700"
+                  isActive={true}
+                  onClick={() => handleClick(rowIndex, colIndex)}
+                />
+              );
+            });
+          })}
+        </div>
+      </div>
     </div>
   );
 }
