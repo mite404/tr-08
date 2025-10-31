@@ -48,7 +48,12 @@ const colorMap: { [key: string]: string } = {
 function App() {
   const [bpm, setBpm] = useState(130);
   const [grid, setGrid] = useState(initialGrid);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(3);
+
+  // scheduling loop??
+  // const intervalId = setInterval(() => {
+  //   console.log("tick");
+  // }, 100);
 
   function handleClick(rowIndex: number, colIndex: number) {
     console.log(`Clicked: row ${rowIndex}, col ${colIndex}`);
@@ -64,6 +69,10 @@ function App() {
       return colorMap[baseColor] ?? baseColor;
     }
   };
+
+  function advancePlayhead() {
+    setCurrentStep((prev) => (prev + 1) % 8);
+  }
 
   return (
     // whole page container
@@ -83,6 +92,7 @@ function App() {
                       grid[rowIndex][colIndex],
                     )}
                     isActive={grid[rowIndex][colIndex]}
+                    isCurrentStep={colIndex === currentStep}
                     onClick={() => handleClick(rowIndex, colIndex)}
                   />
                 );
@@ -92,10 +102,7 @@ function App() {
         </div>
         {/* control buttons container */}
         <div className="grid grid-cols-2 gap-2 pt-4">
-          <Button
-            text="PLAY"
-            onClick={() => console.log("PLAY button clicked!")}
-          />
+          <Button text="PLAY" onClick={advancePlayhead} />
           <Button
             text="STOP"
             onClick={() => console.log("STOP button clicked!")}

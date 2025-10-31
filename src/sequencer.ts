@@ -21,3 +21,4 @@ function playSound(grid, row, currentStep) {
 function changeBpm(bpm) {
   //
 }
+
