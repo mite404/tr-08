@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
 import { Button } from "./components/Button";
-import { togglePad } from "./sequencer";
+import { createSequencer as createSequencer, togglePad } from "./sequencer";
 
 const initialGrid = [
   [false, false, false, false, false, false, false, false], // track 0
@@ -49,13 +49,20 @@ function App() {
   const [bpm, setBpm] = useState(130);
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(3);
+  const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
 
   // scheduling loop??
   // const intervalId = setInterval(() => {
   //   console.log("tick");
   // }, 100);
 
-  function handleClick(rowIndex: number, colIndex: number) {
+  useEffect(() => {
+    createSequencerRef.current = createSequencer(bpm, (step: number) => {
+      setCurrentStep(step);
+    });
+  }, []);
+
+  function handlePadClick(rowIndex: number, colIndex: number) {
     console.log(`Clicked: row ${rowIndex}, col ${colIndex}`);
 
     const newGrid = togglePad(grid, rowIndex, colIndex);
@@ -70,8 +77,16 @@ function App() {
     }
   };
 
-  function advancePlayhead() {
-    setCurrentStep((prev) => (prev + 1) % 8);
+  function handlePlayClick() {
+    if (createSequencerRef.current) {
+      createSequencerRef.current.start();
+    }
+  }
+
+  function handleStopClick() {
+    if (createSequencerRef.current) {
+      createSequencerRef.current.stop();
+    }
   }
 
   return (
@@ -93,7 +108,7 @@ function App() {
                     )}
                     isActive={grid[rowIndex][colIndex]}
                     isCurrentStep={colIndex === currentStep}
-                    onClick={() => handleClick(rowIndex, colIndex)}
+                    onClick={() => handlePadClick(rowIndex, colIndex)}
                   />
                 );
               });
@@ -102,11 +117,8 @@ function App() {
         </div>
         {/* control buttons container */}
         <div className="grid grid-cols-2 gap-2 pt-4">
-          <Button text="PLAY" onClick={advancePlayhead} />
-          <Button
-            text="STOP"
-            onClick={() => console.log("STOP button clicked!")}
-          />
+          <Button text="PLAY" onClick={handlePlayClick} />
+          <Button text="STOP" onClick={handleStopClick} />
         </div>
       </div>
     </div>
