@@ -74,7 +74,7 @@ function App() {
         <div className="rounded-md border-10 border-gray-900">
           {/* beat grid */}
           <div className="grid grid-cols-8 gap-2">
-            {initialGrid.map((track, rowIndex) => {
+            {grid.map((track, rowIndex) => {
               return track.map((_, colIndex) => {
                 return (
                   <Pad
@@ -82,7 +82,7 @@ function App() {
                       tracks[rowIndex].color,
                       grid[rowIndex][colIndex],
                     )}
-                    isActive={initialGrid[rowIndex][colIndex]}
+                    isActive={grid[rowIndex][colIndex]}
                     onClick={() => handleClick(rowIndex, colIndex)}
                   />
                 );
