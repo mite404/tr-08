@@ -23,11 +23,12 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
         currentStep = (currentStep + 1) % 8; // advance step
         onStep(currentStep); // pass to callback
       }, intervalValue);
+
       isPlaying = true;
     },
 
     stop() {
-      if (timerId) {
+      if (timerId && timerId !== null) {
         clearInterval(timerId);
         isPlaying = false;
         timerId = null;
@@ -37,7 +38,16 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
     },
 
     setBPM(newBPM: number) {
-      currentBPM = newBPM;
+      if (isPlaying && timerId !== null) {
+        clearInterval(timerId);
+
+        timerId = setInterval(() => {
+          currentStep = (currentStep + 1) % 8; // advance step
+          onStep(currentStep); // pass to callback
+        }, intervalValue);
+
+        currentBPM = newBPM;
+      }
     },
   };
 }

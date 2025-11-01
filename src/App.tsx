@@ -48,13 +48,8 @@ const colorMap: { [key: string]: string } = {
 function App() {
   const [bpm, setBpm] = useState(130);
   const [grid, setGrid] = useState(initialGrid);
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(0);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
-
-  // scheduling loop??
-  // const intervalId = setInterval(() => {
-  //   console.log("tick");
-  // }, 100);
 
   useEffect(() => {
     createSequencerRef.current = createSequencer(bpm, (step: number) => {
