@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
 import { Button } from "./components/Button";
+import { SetTempoBtn } from "./components/SetTempoBtn";
 import { createSequencer as createSequencer, togglePad } from "./sequencer";
 
 const initialGrid = [
@@ -111,8 +112,14 @@ function App() {
           </div>
         </div>
         {/* control buttons container */}
-        <div className="grid grid-cols-2 gap-2 pt-4">
+        <div className="grid gap-2 pt-4">
           <Button text="PLAY" onClick={handlePlayClick} />
+          <SetTempoBtn
+            bpmValue={bpm}
+            onClick={() => {
+              console.log("set tempo clicked");
+            }}
+          />
           <Button text="STOP" onClick={handleStopClick} />
         </div>
       </div>
