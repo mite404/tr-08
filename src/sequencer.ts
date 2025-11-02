@@ -37,7 +37,7 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
       }
     },
 
-    setBPM(newBPM: number) {
+    updateBPM(newBPM: number) {
       if (isPlaying && timerId !== null) {
         clearInterval(timerId);
 

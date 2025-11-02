@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
 import { Button } from "./components/Button";
-import { SetTempoBtn } from "./components/SetTempoBtn";
-import { createSequencer as createSequencer, togglePad } from "./sequencer";
+import { TempoDisplay } from "./components/TempoDisplay";
+import { createSequencer, togglePad } from "./sequencer";
 
 const initialGrid = [
   [false, false, false, false, false, false, false, false], // track 0
@@ -55,6 +55,7 @@ function App() {
   useEffect(() => {
     createSequencerRef.current = createSequencer(bpm, (step: number) => {
       setCurrentStep(step);
+      setBpm(bpm);
     });
   }, []);
 
@@ -85,11 +86,17 @@ function App() {
     }
   }
 
+  function handleSetBPM() {
+    if (createSequencerRef.current) {
+      createSequencerRef.current.updateBPM();
+    }
+  }
+
   return (
     // whole page container
     <div className="flex min-h-screen items-center justify-center bg-gray-950">
       {/* device container */}
-      <div className="h-[500px] rounded-xl bg-gray-600 p-4 pt-20 pr-8 pl-8">
+      <div className="rounded-xl bg-gray-600 p-4 pt-20 pr-8 pb-8 pl-8">
         {/* beat grid container */}
         <div className="rounded-md border-10 border-gray-900">
           {/* beat grid */}
@@ -112,15 +119,26 @@ function App() {
           </div>
         </div>
         {/* control buttons container */}
-        <div className="grid gap-2 pt-4">
-          <Button text="PLAY" onClick={handlePlayClick} />
-          <SetTempoBtn
-            bpmValue={bpm}
-            onClick={() => {
-              console.log("set tempo clicked");
-            }}
-          />
-          <Button text="STOP" onClick={handleStopClick} />
+        <div className="grid grid-cols-2 gap-4 pt-2">
+          <div className="">
+            <Button text="PLAY" customStyles="mb-4" onClick={handlePlayClick} />
+            <Button text="STOP" customStyles="" onClick={handleStopClick} />
+          </div>
+          {/* set tempo controls container */}
+          <div className="grid grid-cols-1">
+            <TempoDisplay
+              bpmValue={bpm}
+              onClick={() => {
+                console.log("set tempo clicked");
+              }}
+            />
+            <Button
+              text="SET TEMPO"
+              customStyles="mt-4"
+              onIncrementClick={handleSetBPM}
+              onDecrementClick={handleSetBPM}
+            />
+          </div>
         </div>
       </div>
     </div>
