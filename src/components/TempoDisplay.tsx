@@ -1,9 +1,14 @@
 type TempoBtnProps = {
   bpmValue: number;
-  onClick: () => void;
+  onIncrementClick: () => void;
+  onDecrementClick: () => void;
 };
 
-export function TempoDisplay({ bpmValue, onClick }: TempoBtnProps) {
+export function TempoDisplay({
+  bpmValue,
+  onIncrementClick,
+  onDecrementClick,
+}: TempoBtnProps) {
   return (
     // BPM Display
     <div className="flex">
@@ -16,10 +21,16 @@ export function TempoDisplay({ bpmValue, onClick }: TempoBtnProps) {
 
       {/* arrow container */}
       <div className="flex h-10 flex-col">
-        <button className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-tr-lg bg-gray-500 p-0 text-sm select-none hover:opacity-80">
+        <button
+          className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-tr-lg bg-gray-500 p-0 text-sm select-none hover:opacity-80"
+          onClick={onIncrementClick}
+        >
           ⇧
         </button>
-        <button className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-br-lg bg-gray-500 p-0 select-none hover:opacity-80">
+        <button
+          className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-br-lg bg-gray-500 p-0 select-none hover:opacity-80"
+          onClick={onDecrementClick}
+        >
           ⇩
         </button>
       </div>

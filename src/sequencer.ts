@@ -12,8 +12,8 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
   let timerId: number | null = null;
   let isPlaying = false;
   let currentStep = 0;
-  let currentBPM = bpm;
-  const intervalValue = 60000 / currentBPM;
+  let currentBpm = bpm;
+  const intervalValue = 60000 / currentBpm;
 
   return {
     start() {
@@ -37,16 +37,16 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
       }
     },
 
-    updateBPM(newBPM: number) {
+    updateBpm(newBpm: number) {
       if (isPlaying && timerId !== null) {
         clearInterval(timerId);
+        currentBpm = newBpm;
+        const newIntervalValue = 60000 / newBpm;
 
         timerId = setInterval(() => {
-          currentStep = (currentStep + 1) % 8; // advance step
-          onStep(currentStep); // pass to callback
-        }, intervalValue);
-
-        currentBPM = newBPM;
+          currentStep = (currentStep + 1) % 8;
+          onStep(currentStep);
+        }, newIntervalValue); // interval for the clock needs to be calc based on newBpm
       }
     },
   };
