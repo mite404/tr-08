@@ -55,7 +55,6 @@ function App() {
   useEffect(() => {
     createSequencerRef.current = createSequencer(bpm, (step: number) => {
       setCurrentStep(step);
-      setBpm(bpm);
     });
   }, []);
 
@@ -86,9 +85,21 @@ function App() {
     }
   }
 
-  function handleSetBPM() {
+  function handleIncrementBpm() {
+    const newBpm = bpm + 1;
+    setBpm(newBpm);
+
     if (createSequencerRef.current) {
-      createSequencerRef.current.updateBPM();
+      createSequencerRef.current.updateBpm(newBpm);
+    }
+  }
+
+  function handleDecrementBpm() {
+    const newBpm = bpm - 1;
+    setBpm(newBpm);
+
+    if (createSequencerRef.current) {
+      createSequencerRef.current.updateBpm(newBpm);
     }
   }
 
@@ -128,15 +139,15 @@ function App() {
           <div className="grid grid-cols-1">
             <TempoDisplay
               bpmValue={bpm}
-              onClick={() => {
-                console.log("set tempo clicked");
-              }}
+              onIncrementClick={handleIncrementBpm}
+              onDecrementClick={handleDecrementBpm}
             />
             <Button
               text="SET TEMPO"
               customStyles="mt-4"
-              onIncrementClick={handleSetBPM}
-              onDecrementClick={handleSetBPM}
+              onClick={() => {
+                console.log("set tempo clicked");
+              }}
             />
           </div>
         </div>
