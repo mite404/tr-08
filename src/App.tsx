@@ -57,11 +57,17 @@ function App() {
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
+  const gridRef = useRef(grid)
+  
+  // giving callback in createSequencer fresh state of grid
+  useEffect(() => {
+    gridRef.current = grid
+  }, [grid])
 
   useEffect(() => {
     createSequencerRef.current = createSequencer(bpm, (step: number) => {
       setCurrentStep(step);
-      const trackIdsThatAreActive = getActiveSamplesAtStep(step, grid);
+      const trackIdsThatAreActive = getActiveSamplesAtStep(step, gridRef.current);
       const activeSamplePaths = mapActiveSamplesToPath(
         trackIdsThatAreActive,
         tracks,
@@ -90,14 +96,7 @@ function App() {
     activeTrkAtCurrentStep: Array<number>,
     trackObjectsArr: Array<TrackObject>,
   ): Array<string> {
-    const samplesToLoadArr: Array<string> = [];
-
-    activeTrkAtCurrentStep.map((index) => {
-      const sampleStringToGet = trackObjectsArr[index].sound; // capture sample paths
-      samplesToLoadArr.push(sampleStringToGet);
-    });
-
-    return samplesToLoadArr; // return array of strings of sample paths
+    return activeTrkAtCurrentStep.map((index) => trackObjectsArr[index].sound); // capture sample paths & return array
   }
 
   function handlePadClick(rowIndex: number, colIndex: number) {
