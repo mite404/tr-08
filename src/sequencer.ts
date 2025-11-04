@@ -1,4 +1,4 @@
-type Grid = boolean[][];
+type Grid = Array<Array<boolean>>;
 
 export function togglePad(grid: Grid, row: number, col: number): Grid {
   const newGrid = structuredClone(grid);
@@ -13,7 +13,7 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
   let isPlaying = false;
   let currentStep = 0;
   let currentBpm = bpm;
-  const intervalValue = 60000 / currentBpm;
+  let intervalValue = 60000 / currentBpm;
 
   return {
     start() {
@@ -30,9 +30,11 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
     stop() {
       if (timerId && timerId !== null) {
         clearInterval(timerId);
+
         isPlaying = false;
         timerId = null;
         currentStep = 0;
+
         onStep(currentStep);
       }
     },
@@ -40,26 +42,15 @@ export function createSequencer(bpm: number, onStep: (step: number) => void) {
     updateBpm(newBpm: number) {
       if (isPlaying && timerId !== null) {
         clearInterval(timerId);
+
         currentBpm = newBpm;
-        const newIntervalValue = 60000 / newBpm;
+        intervalValue = 60000 / newBpm;
 
         timerId = setInterval(() => {
           currentStep = (currentStep + 1) % 8;
           onStep(currentStep);
-        }, newIntervalValue); // interval for the clock needs to be calc based on newBpm
+        }, intervalValue); // interval for the clock needs to be calc based on newBpm
       }
     },
   };
 }
-
-// function advancePlayhead(currentStep) {
-//   //
-// }
-
-// function playSound(grid, row, currentStep) {
-//   //
-// }
-
-// function changeBpm(bpm) {
-//   //
-// }
