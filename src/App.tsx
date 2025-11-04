@@ -5,16 +5,22 @@ import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 
+type TrackObject = {
+  name: string;
+  sound: string;
+  color: string;
+};
+
 const initialGrid = [
-  [false, false, false, false, false, false, false, false], // track 0
-  [false, false, false, false, false, false, false, false], // track 1
-  [false, false, false, false, false, false, false, false], // track 2
+  [false, true, false, false, false, true, false, false], // track 0
+  [false, false, true, false, false, false, true, false], // track 1
+  [false, false, false, true, false, false, false, false], // track 2
   [false, false, false, false, false, false, false, false], // track 3
   [false, false, false, false, false, false, false, false], // track 4
-  [false, false, false, false, false, false, false, false], // track 5
+  [false, false, true, false, false, true, false, false], // track 5
   [false, false, false, false, false, false, false, false], // track 6
-  [false, false, false, false, false, false, false, false], // track 7
-  [false, false, false, false, false, false, false, false], // track 8
+  [true, false, false, false, true, false, false, false], // track 7
+  [false, true, false, false, false, false, true, false], // track 8
   [false, false, false, false, false, false, false, false], // track 9
 ];
 
@@ -55,8 +61,44 @@ function App() {
   useEffect(() => {
     createSequencerRef.current = createSequencer(bpm, (step: number) => {
       setCurrentStep(step);
+      const trackIdsThatAreActive = getActiveSamplesAtStep(step, grid);
+      const activeSamplePaths = mapActiveSamplesToPath(
+        trackIdsThatAreActive,
+        tracks,
+      );
+      // TODO: sendSamplesToAudioEng(activeSamplePaths)
     });
   }, []);
+
+  function getActiveSamplesAtStep(
+    step: number,
+    grid: Array<Array<boolean>>,
+  ): Array<number> {
+    const trackIdsThatAreActive: Array<number> = [];
+    for (let trackIndex = 0; trackIndex < grid.length; trackIndex++) {
+      const currentTrack: boolean[] = grid[trackIndex];
+      const currentSettingOfTrackAtCurrentStep = currentTrack[step];
+      if (currentSettingOfTrackAtCurrentStep === true) {
+        trackIdsThatAreActive.push(trackIndex);
+      }
+    }
+    return trackIdsThatAreActive;
+  }
+
+  // map over active tracks array of indicies & transform into array of sample paths
+  function mapActiveSamplesToPath(
+    activeTrkAtCurrentStep: Array<number>,
+    trackObjectsArr: Array<TrackObject>,
+  ): Array<string> {
+    const samplesToLoadArr: Array<string> = [];
+
+    activeTrkAtCurrentStep.map((index) => {
+      const sampleStringToGet = trackObjectsArr[index].sound; // capture sample paths
+      samplesToLoadArr.push(sampleStringToGet);
+    });
+
+    return samplesToLoadArr; // return array of strings of sample paths
+  }
 
   function handlePadClick(rowIndex: number, colIndex: number) {
     console.log(`Clicked: row ${rowIndex}, col ${colIndex}`);

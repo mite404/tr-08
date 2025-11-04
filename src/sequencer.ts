@@ -1,4 +1,4 @@
-type Grid = boolean[][];
+type Grid = Array<Array<boolean>>;
 
 export function togglePad(grid: Grid, row: number, col: number): Grid {
   const newGrid = structuredClone(grid);
