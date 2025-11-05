@@ -28,35 +28,55 @@ const initialGrid = [
 
 const tracks = [
   {
-    name: "Kick 1",
+    name: "KICK 01",
     sound: "src/assets/samples/KICK01.wav",
     color: "bg-red-900",
   },
   {
-    name: "Kick 2",
+    name: "KICK 20",
     sound: "src/assets/samples/KICK02.wav",
     color: "bg-red-900",
   },
   {
-    name: "Bass 1",
-    sound: "src/assets/samples/CHORDS01.wav",
+    name: "BASS 01",
+    sound: "src/assets/samples/Bass_Tone_C_013.wav",
     color: "bg-orange-800",
   },
   {
-    name: "FLUTE",
-    sound: "src/assets/samples/FLUTE01.wav",
+    name: "BASS 02",
+    sound: "src/assets/samples/BASS01.wav",
     color: "bg-orange-800",
   },
   {
-    name: "PAD01",
-    sound: "src/assets/samples/SYNTH_PAD01.wav",
+    name: "SNARE 01",
+    sound: "src/assets/samples/JA_SNARE_1.wav",
     color: "bg-yellow-800",
   },
-  { name: "Snare 2", sound: "", color: "bg-yellow-800" },
-  { name: "Synth 1", sound: "", color: "bg-yellow-900" },
-  { name: "Synth 2", sound: "", color: "bg-yellow-900" },
-  { name: "HiHat 1", sound: "", color: "bg-orange-950" },
-  { name: "HiHat 2", sound: "", color: "bg-orange-950" },
+  {
+    name: "SNARE 02",
+    sound: "src/assets/samples/JA_SNARE_2.wav",
+    color: "bg-yellow-800",
+  },
+  {
+    name: "SYNTH 01",
+    sound: "src/assets/samples/Stabs_&_Chords_016_Dm.wav",
+    color: "bg-yellow-900",
+  },
+  {
+    name: "SYNTH 02",
+    sound: "src/assets/samples/Stabs_&_Chords_028_C.wav",
+    color: "bg-yellow-900",
+  },
+  {
+    name: "HH 01",
+    sound: "src/assets/samples/Bh_Hit_Hihat_0008.wav",
+    color: "bg-orange-950",
+  },
+  {
+    name: "HH 02",
+    sound: "src/assets/samples/Bh_Hit_Hihat_0009.wav",
+    color: "bg-orange-950",
+  },
 ];
 
 const colorMap: { [key: string]: string } = {
@@ -100,10 +120,12 @@ function App() {
       );
 
       if (allPlayersReady) {
+        const now = Tone.now(); // get current audio context time
+
         for (const trackId of trackIdsThatAreActive) {
           if (tracks[trackId].player) {
             console.log("Player initialized for track:", tracks[trackId]);
-            tracks[trackId].player.start();
+            tracks[trackId].player.start(now);
           } else {
             console.error(
               "Player was not initialized on track:",
@@ -112,10 +134,6 @@ function App() {
           }
         }
 
-        // for each active track: check if tracks[id].player.loaded === true
-        // only call .start() if true
-        // trigger players
-
         console.log("Sequencer Loaded!");
       }
     });
@@ -123,7 +141,7 @@ function App() {
 
   // check if all players have loaded their samples
   useEffect(() => {
-    if (loadedCount === 2) {
+    if (loadedCount === 10) {
       setAllPlayersReady(true);
       console.log("loadedCount:", loadedCount);
     }
@@ -156,9 +174,16 @@ function App() {
     for (const track of tracks) {
       const trackPath = track.sound;
 
-      const player = new Tone.Player(trackPath, () => {
-        setLoadedCount((prev) => prev + 1);
-        console.log("loadedCount:", loadedCount);
+      const player = new Tone.Player({
+        url: trackPath,
+        onload: () => {
+          setLoadedCount((prev) => prev + 1);
+          console.log("loadedCount:", loadedCount);
+        },
+        onerror: (error) => {
+          console.log(`Failed to load sample for ${track.name}:`, error);
+          setLoadedCount((prev) => prev + 1); // cont loaded anyway to avoid blocking
+        },
       }).toDestination();
       track.player = player;
     }
