@@ -274,7 +274,7 @@ function App() {
               text="PLAY"
               customStyles="mb-4"
               onClick={handlePlayClick}
-              disabled={allPlayersReady}
+              disabled={!allPlayersReady}
             />
             <Button text="STOP" customStyles="" onClick={handleStopClick} />
           </div>
