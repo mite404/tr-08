@@ -6,7 +6,7 @@ type PadProps = {
 };
 
 export function Pad({ color, isActive, isCurrentStep, onClick }: PadProps) {
-  console.log("isCurrentStep:", isCurrentStep);
+  console.log("current step:", isCurrentStep);
 
   return (
     <button
