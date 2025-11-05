@@ -26,9 +26,11 @@ The application uses **React hooks** with a functional component architecture. K
 3. **Current Step** (`currentStep`): Which of the 8 steps is currently being played (0-7)
 
 **Grid Structure:**
+
 ```
 grid[trackIndex][stepIndex] = boolean
 ```
+
 - 10 tracks (rows): Different drum sounds (kicks, bass, snare, synth, hi-hat)
 - 8 steps (columns): One bar divided into 8 positions
 - `true` = sound plays at this step, `false` = silent
@@ -76,6 +78,7 @@ All UI components are functional components with TypeScript prop types:
 ## TypeScript Configuration
 
 Strict mode is enabled (`"strict": true`). Key compiler options:
+
 - Target: ES2022
 - Module: ESNext
 - JSX: react-jsx
@@ -85,22 +88,14 @@ Strict mode is enabled (`"strict": true`). Key compiler options:
 ## Dependencies
 
 - **`react` & `react-dom`**: UI framework
-- **`tone.js`**: (installed but not yet integrated) For audio playback - audio context is being created but not yet hooked to sequencer output
+- **`tone.js`**: For audio playback
 - **Tailwind CSS**: Utility-first styling
 - **Vite**: Build tool with React plugin
-
-## Known TODOs & Integration Points
-
-1. **Audio Integration** (`App.tsx:95`): Currently logs active sample paths but doesn't send them to audio engine
-   - The `mapActiveSamplesToPath()` function returns an array of sound file paths ready for playback
-   - This needs to integrate with Tone.js to actually play the sounds
-   - Audio samples are referenced by filename (e.g., "kick1.wav", "bass1.wav") but haven't been loaded/registered yet
-
-2. **Sample Loading**: Audio samples need to be fetched and available to Tone.js or Web Audio API
 
 ## ESLint Configuration
 
 Uses recommended configs for:
+
 - ESLint base rules
 - TypeScript ESLint (`typescript-eslint`)
 - React Hooks (`eslint-plugin-react-hooks`)
