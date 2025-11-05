@@ -177,8 +177,10 @@ function App() {
       const player = new Tone.Player({
         url: trackPath,
         onload: () => {
-          setLoadedCount((prev) => prev + 1);
-          console.log("loadedCount:", loadedCount);
+          setLoadedCount((prev) => {
+            console.log("loadedCount:", prev + 1);
+            return prev + 1;
+          });
         },
         onerror: (error) => {
           console.log(`Failed to load sample for ${track.name}:`, error);
