@@ -4,37 +4,59 @@ import { Pad } from "./components/Pad";
 import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
+import * as Tone from "tone";
 
 type TrackObject = {
   name: string;
   sound: string;
   color: string;
+  player?: Tone.Player | undefined; // tone.js Player instance added on initialization of Players
 };
 
 const initialGrid = [
-  [false, true, false, false, false, true, false, false], // track 0
-  [false, false, true, false, false, false, true, false], // track 1
-  [false, false, false, true, false, false, false, false], // track 2
+  [true, false, false, false, false, false, false, false], // track 0
+  [true, false, false, false, false, false, false, false], // track 1
+  [false, false, false, false, false, false, false, false], // track 2
   [false, false, false, false, false, false, false, false], // track 3
   [false, false, false, false, false, false, false, false], // track 4
-  [false, false, true, false, false, true, false, false], // track 5
+  [false, false, false, false, false, false, false, false], // track 5
   [false, false, false, false, false, false, false, false], // track 6
-  [true, false, false, false, true, false, false, false], // track 7
-  [false, true, false, false, false, false, true, false], // track 8
+  [false, false, false, false, false, false, false, false], // track 7
+  [false, false, false, false, false, false, false, false], // track 8
   [false, false, false, false, false, false, false, false], // track 9
 ];
 
 const tracks = [
-  { name: "Kick 1", sound: "kick1.wav", color: "bg-red-900" },
-  { name: "Kick 2", sound: "kick2.wav", color: "bg-red-900" },
-  { name: "Bass 1", sound: "bass1.wav", color: "bg-orange-800" },
-  { name: "Bass 2", sound: "bass2.wav", color: "bg-orange-800" },
-  { name: "Snare 1", sound: "snare1.wav", color: "bg-yellow-800" },
-  { name: "Snare 2", sound: "snare2.wav", color: "bg-yellow-800" },
-  { name: "Synth 1", sound: "synth1.wav", color: "bg-yellow-900" },
-  { name: "Synth 2", sound: "synth2.wav", color: "bg-yellow-900" },
-  { name: "HiHat 1", sound: "hh1.wav", color: "bg-orange-950" },
-  { name: "HiHat 2", sound: "hh2.wav", color: "bg-orange-950" },
+  {
+    name: "Kick 1",
+    sound: "src/assets/samples/KICK01.wav",
+    color: "bg-red-900",
+  },
+  {
+    name: "Kick 2",
+    sound: "src/assets/samples/KICK02.wav",
+    color: "bg-red-900",
+  },
+  {
+    name: "Bass 1",
+    sound: "src/assets/samples/CHORDS01.wav",
+    color: "bg-orange-800",
+  },
+  {
+    name: "FLUTE",
+    sound: "src/assets/samples/FLUTE01.wav",
+    color: "bg-orange-800",
+  },
+  {
+    name: "PAD01",
+    sound: "src/assets/samples/SYNTH_PAD01.wav",
+    color: "bg-yellow-800",
+  },
+  { name: "Snare 2", sound: "", color: "bg-yellow-800" },
+  { name: "Synth 1", sound: "", color: "bg-yellow-900" },
+  { name: "Synth 2", sound: "", color: "bg-yellow-900" },
+  { name: "HiHat 1", sound: "", color: "bg-orange-950" },
+  { name: "HiHat 2", sound: "", color: "bg-orange-950" },
 ];
 
 const colorMap: { [key: string]: string } = {
@@ -56,25 +78,61 @@ function App() {
   const [bpm, setBpm] = useState(130);
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
+  const [loadedCount, setLoadedCount] = useState(0);
+  const [allPlayersReady, setAllPlayersReady] = useState(true);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
-  const gridRef = useRef(grid)
-  
+  const gridRef = useRef(grid);
+  const playersInitializedRef = useRef(false);
+
   // giving callback in createSequencer fresh state of grid
   useEffect(() => {
-    gridRef.current = grid
-  }, [grid])
+    gridRef.current = grid;
+  }, [grid]);
 
+  // init Players and Sequencer
   useEffect(() => {
     createSequencerRef.current = createSequencer(bpm, (step: number) => {
       setCurrentStep(step);
-      const trackIdsThatAreActive = getActiveSamplesAtStep(step, gridRef.current);
-      const activeSamplePaths = mapActiveSamplesToPath(
-        trackIdsThatAreActive,
-        tracks,
+
+      const trackIdsThatAreActive = getActiveSamplesAtStep(
+        step,
+        gridRef.current,
       );
-      // TODO: sendSamplesToAudioEng(activeSamplePaths)
+
+      if (allPlayersReady) {
+        for (const trackId of trackIdsThatAreActive) {
+          if (tracks[trackId].player) {
+            console.log("Player initialized for track:", tracks[trackId]);
+            tracks[trackId].player.start();
+          } else {
+            console.error(
+              "Player was not initialized on track:",
+              tracks[trackId],
+            );
+          }
+        }
+
+        // for each active track: check if tracks[id].player.loaded === true
+        // only call .start() if true
+        // trigger players
+
+        console.log("Sequencer Loaded!");
+      }
     });
   }, []);
+
+  // check if all players have loaded their samples
+  useEffect(() => {
+    if (loadedCount === 2) {
+      setAllPlayersReady(true);
+      console.log("loadedCount:", loadedCount);
+    }
+  }, [loadedCount]);
+
+  // useEffect(() => {
+  //   if (createSequencerRef.current !== null)
+  //     createSequencerRef.current.start();
+  // }, [allPlayersReady]);
 
   function getActiveSamplesAtStep(
     step: number,
@@ -91,19 +149,19 @@ function App() {
     return trackIdsThatAreActive;
   }
 
-  // map over active tracks array of indicies & transform into array of sample paths
-  function mapActiveSamplesToPath(
-    activeTrkAtCurrentStep: Array<number>,
-    trackObjectsArr: Array<TrackObject>,
-  ): Array<string> {
-    return activeTrkAtCurrentStep.map((index) => trackObjectsArr[index].sound); // capture sample paths & return array
-  }
+  function initPlayers(
+    tracks: Array<TrackObject>,
+    setLoadedCount: React.Dispatch<React.SetStateAction<number>>,
+  ) {
+    for (const track of tracks) {
+      const trackPath = track.sound;
 
-  function handlePadClick(rowIndex: number, colIndex: number) {
-    console.log(`Clicked: row ${rowIndex}, col ${colIndex}`);
-
-    const newGrid = togglePad(grid, rowIndex, colIndex);
-    setGrid(newGrid);
+      const player = new Tone.Player(trackPath, () => {
+        setLoadedCount((prev) => prev + 1);
+        console.log("loadedCount:", loadedCount);
+      }).toDestination();
+      track.player = player;
+    }
   }
 
   const getActiveColor = (baseColor: string, isActive: boolean): string => {
@@ -114,7 +172,19 @@ function App() {
     }
   };
 
+  function handlePadClick(rowIndex: number, colIndex: number) {
+    console.log(`Clicked: row ${rowIndex}, col ${colIndex}`);
+
+    const newGrid = togglePad(grid, rowIndex, colIndex);
+    setGrid(newGrid);
+  }
+
   function handlePlayClick() {
+    if (!playersInitializedRef.current) {
+      initPlayers(tracks, setLoadedCount);
+      playersInitializedRef.current = true;
+    }
+
     if (createSequencerRef.current) {
       createSequencerRef.current.start();
     }
@@ -173,7 +243,12 @@ function App() {
         {/* control buttons container */}
         <div className="grid grid-cols-2 gap-4 pt-2">
           <div className="">
-            <Button text="PLAY" customStyles="mb-4" onClick={handlePlayClick} />
+            <Button
+              text="PLAY"
+              customStyles="mb-4"
+              onClick={handlePlayClick}
+              disabled={allPlayersReady}
+            />
             <Button text="STOP" customStyles="" onClick={handleStopClick} />
           </div>
           {/* set tempo controls container */}
@@ -184,7 +259,7 @@ function App() {
               onDecrementClick={handleDecrementBpm}
             />
             <Button
-              text="SET TEMPO"
+              text=" --- "
               customStyles="mt-4"
               onClick={() => {
                 console.log("set tempo clicked");
