@@ -14,16 +14,186 @@ export type TrackObject = {
 };
 
 const initialGrid = [
-  [true, false, false, false, false, false, false, false], // track 0
-  [true, false, false, false, false, false, false, false], // track 1
-  [false, false, false, false, false, false, false, false], // track 2
-  [false, false, false, false, false, false, false, false], // track 3
-  [false, false, false, false, false, false, false, false], // track 4
-  [false, false, false, false, false, false, false, false], // track 5
-  [false, false, false, false, false, false, false, false], // track 6
-  [false, false, false, false, false, false, false, false], // track 7
-  [false, false, false, false, false, false, false, false], // track 8
-  [false, false, false, false, false, false, false, false], // track 9
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 0
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 1
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 2
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 3
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 4
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 5
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 6
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 7
+  [
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+    true,
+  ], // track 8
+  [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ], // track 9
 ];
 
 const tracks = [
@@ -217,7 +387,7 @@ function App() {
         {/* beat grid container */}
         <div className="rounded-md border-10 border-gray-900">
           {/* beat grid */}
-          <div className="grid grid-cols-8 gap-2">
+          <div className="grid grid-cols-16 gap-2">
             {grid.map((track, rowIndex) => {
               return track.map((_, colIndex) => {
                 return (
@@ -228,6 +398,7 @@ function App() {
                     )}
                     isActive={grid[rowIndex][colIndex]}
                     isCurrentStep={colIndex === currentStep}
+                    is16thNote={colIndex % 2 === 0}
                     onClick={() => handlePadClick(rowIndex, colIndex)}
                   />
                 );

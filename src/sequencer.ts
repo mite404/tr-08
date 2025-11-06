@@ -63,9 +63,9 @@ export function createSequencer(
       onStep(stepToPlay);
     }, time);
 
-    currentStep = (currentStep + 1) % 8; // incrememnt the step after Transport callback is fired
+    currentStep = (currentStep + 1) % 16; // incrememnt the step after Transport callback is fired
     console.log(`advancing to next step:`, currentStep);
-  }, "8n");
+  }, "16n");
 
   return {
     start() {
