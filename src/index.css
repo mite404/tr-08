@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Stack+Sans+Notch:wght@200..700&display=swap");
 @import "tailwindcss";
 
 .kick-pad1 {
@@ -31,7 +32,12 @@
   background-color: #450a0a;
 }
 
-
+.stack-sans-notch-display1 {
+  font-family: "Stack Sans Notch", sans-serif;
+  font-optical-sizing: auto;
+  /*font-weight: 200;*/
+  font-style: normal;
+}
 
 :root {
   --background-color: #242424;
