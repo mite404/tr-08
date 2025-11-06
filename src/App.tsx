@@ -3,10 +3,14 @@ import "./App.css";
 import { Pad } from "./components/Pad";
 import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
-import { createSequencer, togglePad } from "./sequencer";
+import {
+  createSequencer,
+  togglePad,
+  getActiveSamplesAtStep,
+} from "./sequencer";
 import * as Tone from "tone";
 
-type TrackObject = {
+export type TrackObject = {
   name: string;
   sound: string;
   color: string;
@@ -111,32 +115,37 @@ function App() {
 
   // init Players and Sequencer
   useEffect(() => {
-    createSequencerRef.current = createSequencer(bpm, (step: number) => {
-      setCurrentStep(step);
+    createSequencerRef.current = createSequencer(
+      bpm,
+      (step: number) => {
+        setCurrentStep(step);
 
-      const trackIdsThatAreActive = getActiveSamplesAtStep(
-        step,
-        gridRef.current,
-      );
+        const trackIdsThatAreActive = getActiveSamplesAtStep(
+          step,
+          gridRef.current,
+        );
 
-      if (allPlayersReady) {
-        const now = Tone.now(); // get current audio context time
+        if (allPlayersReady) {
+          const now = Tone.now(); // get current audio context time
 
-        for (const trackId of trackIdsThatAreActive) {
-          if (tracks[trackId].player) {
-            console.log("Player initialized for track:", tracks[trackId]);
-            tracks[trackId].player.start(now);
-          } else {
-            console.error(
-              "Player was not initialized on track:",
-              tracks[trackId],
-            );
+          for (const trackId of trackIdsThatAreActive) {
+            if (tracks[trackId].player) {
+              console.log("Player initialized for track:", tracks[trackId]);
+              tracks[trackId].player.start(now);
+            } else {
+              console.error(
+                "Player was not initialized on track:",
+                tracks[trackId],
+              );
+            }
           }
-        }
 
-        console.log("Sequencer Loaded!");
-      }
-    });
+          console.log("Sequencer Loaded!");
+        }
+      },
+      gridRef,
+      tracks,
+    );
   }, []);
 
   // check if all players have loaded their samples
@@ -151,21 +160,6 @@ function App() {
   //   if (createSequencerRef.current !== null)
   //     createSequencerRef.current.start();
   // }, [allPlayersReady]);
-
-  function getActiveSamplesAtStep(
-    step: number,
-    grid: Array<Array<boolean>>,
-  ): Array<number> {
-    const trackIdsThatAreActive: Array<number> = [];
-    for (let trackIndex = 0; trackIndex < grid.length; trackIndex++) {
-      const currentTrack: boolean[] = grid[trackIndex];
-      const currentSettingOfTrackAtCurrentStep = currentTrack[step];
-      if (currentSettingOfTrackAtCurrentStep === true) {
-        trackIdsThatAreActive.push(trackIndex);
-      }
-    }
-    return trackIdsThatAreActive;
-  }
 
   function initPlayers(
     tracks: Array<TrackObject>,
@@ -298,4 +292,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
