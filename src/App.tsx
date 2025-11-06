@@ -383,11 +383,21 @@ function App() {
     // whole page container
     <div className="flex min-h-screen items-center justify-center bg-gray-950">
       {/* device container */}
-      <div className="rounded-xl bg-gray-600 p-4 pt-20 pr-8 pb-8 pl-8">
+      <div className="rounded-xl bg-gray-600 p-4 pt-12 pr-8 pb-8 pl-8">
+        {/* HEADER container */}
+        <div className="flex items-center">
+          <img
+            className="w-[200px] p-6"
+            src="src/assets/images/MPC_mark.png"
+          ></img>
+          <h1 className="stack-sans-notch-display1 text-7xl font-extralight">
+            TR-08
+          </h1>
+        </div>
         {/* beat grid container */}
         <div className="rounded-md border-10 border-gray-900">
           {/* beat grid */}
-          <div className="grid grid-cols-16 gap-2">
+          <div className="grid grid-cols-16 gap-1 p-0.5">
             {grid.map((track, rowIndex) => {
               return track.map((_, colIndex) => {
                 return (
@@ -407,7 +417,7 @@ function App() {
           </div>
         </div>
         {/* control buttons container */}
-        <div className="grid grid-cols-2 gap-4 pt-2">
+        <div className="grid grid-cols-2 gap-2 p-4 pt-4">
           <div className="">
             <Button
               text="PLAY"

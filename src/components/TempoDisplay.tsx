@@ -22,7 +22,7 @@ export function TempoDisplay({
       {/* arrow container */}
       <div className="flex h-10 flex-col">
         <button
-          className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-tr-lg bg-gray-500 p-0 text-sm select-none hover:opacity-80"
+          className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-tr-lg border-b bg-gray-500 p-0 text-sm select-none hover:opacity-80"
           onClick={onIncrementClick}
         >
           ⇧

@@ -17,7 +17,7 @@ export function Pad({
 
   return (
     <button
-      className={`aspect-3/1 cursor-pointer rounded-sm hover:opacity-80 ${color} ${isActive ? "opacity-100" : "opacity-50"} ${isCurrentStep ? "brightness-175" : ""} ${is16thNote ? "brightness-135" : ""} [rounded-[10px] h-[25px] w-full p-2`}
+      className={`aspect-2/1 cursor-pointer rounded-sm hover:opacity-80 ${color} ${isActive ? "opacity-100" : "opacity-50"} ${isCurrentStep ? "brightness-175" : ""} ${is16thNote ? "brightness-135" : ""} [rounded-[10px] h-[25px] w-full p-2`}
       onClick={onClick}
     ></button>
   );
