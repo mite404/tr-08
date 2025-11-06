@@ -72,11 +72,11 @@ export function createSequencer(
       transport.start();
     },
 
-    // stop() {
-    //   transport.stop();
-    //   currentStep = 0;
-    //   onStep(currentStep);
-    // },
+    stop() {
+      transport.stop();
+      currentStep = 0;
+      onStep(currentStep);
+    },
 
     updateBpm(newBpm: number) {
       transport.bpm.value = newBpm;

@@ -119,13 +119,12 @@ function App() {
       gridRef,
       tracks,
     );
-    createSequencerRef.current = sequencer
-    
+    createSequencerRef.current = sequencer;
+
     return () => {
-      sequencer.stop()
-      sequencer.dispose()
-      createSequencerRef.current = null
-    }
+      sequencer.dispose();
+      createSequencerRef.current = null;
+    };
   }, []);
 
   // check if all players have loaded their samples
