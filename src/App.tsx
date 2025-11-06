@@ -5,6 +5,7 @@ import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
+import { PlayStopBtn } from "./components/PlayStopBtn";
 
 export type TrackObject = {
   name: string;
@@ -425,7 +426,12 @@ function App() {
               onClick={handlePlayClick}
               disabled={!allPlayersReady}
             />
-            <Button text="STOP" customStyles="" onClick={handleStopClick} />
+            <PlayStopBtn
+              text="STOP"
+              customStyles=""
+              onClick={handleStopClick}
+              disabled={!allPlayersReady}
+            />
           </div>
           {/* set tempo controls container */}
           <div className="grid grid-cols-1">
