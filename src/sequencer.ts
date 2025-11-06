@@ -37,14 +37,16 @@ export function createSequencer(
 
   // create tone.js Transport
   const transport = Tone.getTransport();
+  transport.bpm.value = bpm;
 
-  transport.scheduleRepeat((time) => {
+  const scheduledEventId = transport.scheduleRepeat((time) => {
     // callback fires every step
     if (gridRef.current === null) {
       return;
     }
 
     const stepToPlay = currentStep;
+    console.log(`playing`, stepToPlay);
 
     // get active tracks at THIS step
     const activeTrackIds = getActiveSamplesAtStep(stepToPlay, gridRef.current);
@@ -62,6 +64,7 @@ export function createSequencer(
     }, time);
 
     currentStep = (currentStep + 1) % 8; // incrememnt the step after Transport callback is fired
+    console.log(`advancing to next step:`, currentStep);
   }, "8n");
 
   return {
@@ -69,14 +72,19 @@ export function createSequencer(
       transport.start();
     },
 
-    stop() {
-      transport.stop();
-      currentStep = 0;
-      onStep(currentStep);
-    },
+    // stop() {
+    //   transport.stop();
+    //   currentStep = 0;
+    //   onStep(currentStep);
+    // },
 
     updateBpm(newBpm: number) {
       transport.bpm.value = newBpm;
+    },
+    dispose() {
+      transport.clear(scheduledEventId);
+      transport.stop();
+      currentStep = 0;
     },
   };
 }

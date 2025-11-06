@@ -111,7 +111,7 @@ function App() {
 
   // init Players and Sequencer
   useEffect(() => {
-    createSequencerRef.current = createSequencer(
+    const sequencer = createSequencer(
       bpm,
       (step: number) => {
         setCurrentStep(step);
@@ -119,6 +119,13 @@ function App() {
       gridRef,
       tracks,
     );
+    createSequencerRef.current = sequencer
+    
+    return () => {
+      sequencer.stop()
+      sequencer.dispose()
+      createSequencerRef.current = null
+    }
   }, []);
 
   // check if all players have loaded their samples
