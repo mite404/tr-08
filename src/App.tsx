@@ -3,11 +3,7 @@ import "./App.css";
 import { Pad } from "./components/Pad";
 import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
-import {
-  createSequencer,
-  togglePad,
-  getActiveSamplesAtStep,
-} from "./sequencer";
+import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
 
 export type TrackObject = {
@@ -99,7 +95,7 @@ const colorMap: { [key: string]: string } = {
 };
 
 function App() {
-  const [bpm, setBpm] = useState(130);
+  const [bpm, setBpm] = useState(140);
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
@@ -119,29 +115,6 @@ function App() {
       bpm,
       (step: number) => {
         setCurrentStep(step);
-
-        const trackIdsThatAreActive = getActiveSamplesAtStep(
-          step,
-          gridRef.current,
-        );
-
-        if (allPlayersReady) {
-          const now = Tone.now(); // get current audio context time
-
-          for (const trackId of trackIdsThatAreActive) {
-            if (tracks[trackId].player) {
-              console.log("Player initialized for track:", tracks[trackId]);
-              tracks[trackId].player.start(now);
-            } else {
-              console.error(
-                "Player was not initialized on track:",
-                tracks[trackId],
-              );
-            }
-          }
-
-          console.log("Sequencer Loaded!");
-        }
       },
       gridRef,
       tracks,
@@ -155,11 +128,6 @@ function App() {
       console.log("loadedCount:", loadedCount);
     }
   }, [loadedCount]);
-
-  // useEffect(() => {
-  //   if (createSequencerRef.current !== null)
-  //     createSequencerRef.current.start();
-  // }, [allPlayersReady]);
 
   function initPlayers(
     tracks: Array<TrackObject>,

@@ -33,22 +33,21 @@ export function createSequencer(
   gridRef: RefObject<Grid>,
   tracks: Array<TrackObject>,
 ) {
-  let timerId: number | null = null;
-  let isPlaying = false;
   let currentStep = 0;
-  let currentBpm = bpm;
-  let intervalValue = 60000 / currentBpm;
 
   // create tone.js Transport
   const transport = Tone.getTransport();
 
   transport.scheduleRepeat((time) => {
     // callback fires every step
+    if (gridRef.current === null) {
+      return;
+    }
 
-    currentStep = (currentStep + 1) % 8;
+    const stepToPlay = currentStep;
 
     // get active tracks at THIS step
-    const activeTrackIds = getActiveSamplesAtStep(currentStep, gridRef.current);
+    const activeTrackIds = getActiveSamplesAtStep(stepToPlay, gridRef.current);
 
     // start players w/ TIME from Transport
     for (const trackId of activeTrackIds) {
@@ -59,8 +58,10 @@ export function createSequencer(
 
     // schedule UI update
     Tone.Draw.schedule(() => {
-      onStep(currentStep);
+      onStep(stepToPlay);
     }, time);
+
+    currentStep = (currentStep + 1) % 8; // incrememnt the step after Transport callback is fired
   }, "8n");
 
   return {
