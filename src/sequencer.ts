@@ -1,3 +1,7 @@
+import * as Tone from "tone";
+import { type TrackObject } from "./App.tsx";
+import type { RefObject } from "react";
+
 type Grid = Array<Array<boolean>>;
 
 export function togglePad(grid: Grid, row: number, col: number): Grid {
@@ -8,49 +12,79 @@ export function togglePad(grid: Grid, row: number, col: number): Grid {
   return newGrid;
 }
 
-export function createSequencer(bpm: number, onStep: (step: number) => void) {
-  let timerId: number | null = null;
-  let isPlaying = false;
+export function getActiveSamplesAtStep(
+  step: number,
+  grid: Array<Array<boolean>>,
+): Array<number> {
+  const trackIdsThatAreActive: Array<number> = [];
+  for (let trackIndex = 0; trackIndex < grid.length; trackIndex++) {
+    const currentTrack: boolean[] = grid[trackIndex];
+    const currentSettingOfTrackAtCurrentStep = currentTrack[step];
+    if (currentSettingOfTrackAtCurrentStep === true) {
+      trackIdsThatAreActive.push(trackIndex);
+    }
+  }
+  return trackIdsThatAreActive;
+}
+
+export function createSequencer(
+  bpm: number,
+  onStep: (step: number) => void,
+  gridRef: RefObject<Grid>,
+  tracks: Array<TrackObject>,
+) {
   let currentStep = 0;
-  let currentBpm = bpm;
-  let intervalValue = 60000 / currentBpm;
+
+  // create tone.js Transport
+  const transport = Tone.getTransport();
+  transport.bpm.value = bpm;
+
+  const scheduledEventId = transport.scheduleRepeat((time) => {
+    // callback fires every step
+    if (gridRef.current === null) {
+      return;
+    }
+
+    const stepToPlay = currentStep;
+    console.log(`playing`, stepToPlay);
+
+    // get active tracks at THIS step
+    const activeTrackIds = getActiveSamplesAtStep(stepToPlay, gridRef.current);
+
+    // start players w/ TIME from Transport
+    for (const trackId of activeTrackIds) {
+      if (tracks[trackId].player !== undefined) {
+        tracks[trackId].player.start(time); // use Transport time
+      }
+    }
+
+    // schedule UI update
+    Tone.Draw.schedule(() => {
+      onStep(stepToPlay);
+    }, time);
+
+    currentStep = (currentStep + 1) % 8; // incrememnt the step after Transport callback is fired
+    console.log(`advancing to next step:`, currentStep);
+  }, "8n");
 
   return {
     start() {
-      if (isPlaying) return;
-
-      timerId = setInterval(() => {
-        currentStep = (currentStep + 1) % 8; // advance step
-        onStep(currentStep); // pass to callback
-      }, intervalValue);
-
-      isPlaying = true;
+      transport.start();
     },
 
     stop() {
-      if (timerId && timerId !== null) {
-        clearInterval(timerId);
-
-        isPlaying = false;
-        timerId = null;
-        currentStep = 0;
-
-        onStep(currentStep);
-      }
+      transport.stop();
+      currentStep = 0;
+      onStep(currentStep);
     },
 
     updateBpm(newBpm: number) {
-      if (isPlaying && timerId !== null) {
-        clearInterval(timerId);
-
-        currentBpm = newBpm;
-        intervalValue = 60000 / newBpm;
-
-        timerId = setInterval(() => {
-          currentStep = (currentStep + 1) % 8;
-          onStep(currentStep);
-        }, intervalValue); // interval for the clock needs to be calc based on newBpm
-      }
+      transport.bpm.value = newBpm;
+    },
+    dispose() {
+      transport.clear(scheduledEventId);
+      transport.stop();
+      currentStep = 0;
     },
   };
 }

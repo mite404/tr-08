@@ -6,7 +6,7 @@ import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
 
-type TrackObject = {
+export type TrackObject = {
   name: string;
   sound: string;
   color: string;
@@ -95,7 +95,7 @@ const colorMap: { [key: string]: string } = {
 };
 
 function App() {
-  const [bpm, setBpm] = useState(130);
+  const [bpm, setBpm] = useState(140);
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
@@ -111,32 +111,20 @@ function App() {
 
   // init Players and Sequencer
   useEffect(() => {
-    createSequencerRef.current = createSequencer(bpm, (step: number) => {
-      setCurrentStep(step);
+    const sequencer = createSequencer(
+      bpm,
+      (step: number) => {
+        setCurrentStep(step);
+      },
+      gridRef,
+      tracks,
+    );
+    createSequencerRef.current = sequencer;
 
-      const trackIdsThatAreActive = getActiveSamplesAtStep(
-        step,
-        gridRef.current,
-      );
-
-      if (allPlayersReady) {
-        const now = Tone.now(); // get current audio context time
-
-        for (const trackId of trackIdsThatAreActive) {
-          if (tracks[trackId].player) {
-            console.log("Player initialized for track:", tracks[trackId]);
-            tracks[trackId].player.start(now);
-          } else {
-            console.error(
-              "Player was not initialized on track:",
-              tracks[trackId],
-            );
-          }
-        }
-
-        console.log("Sequencer Loaded!");
-      }
-    });
+    return () => {
+      sequencer.dispose();
+      createSequencerRef.current = null;
+    };
   }, []);
 
   // check if all players have loaded their samples
@@ -146,26 +134,6 @@ function App() {
       console.log("loadedCount:", loadedCount);
     }
   }, [loadedCount]);
-
-  // useEffect(() => {
-  //   if (createSequencerRef.current !== null)
-  //     createSequencerRef.current.start();
-  // }, [allPlayersReady]);
-
-  function getActiveSamplesAtStep(
-    step: number,
-    grid: Array<Array<boolean>>,
-  ): Array<number> {
-    const trackIdsThatAreActive: Array<number> = [];
-    for (let trackIndex = 0; trackIndex < grid.length; trackIndex++) {
-      const currentTrack: boolean[] = grid[trackIndex];
-      const currentSettingOfTrackAtCurrentStep = currentTrack[step];
-      if (currentSettingOfTrackAtCurrentStep === true) {
-        trackIdsThatAreActive.push(trackIndex);
-      }
-    }
-    return trackIdsThatAreActive;
-  }
 
   function initPlayers(
     tracks: Array<TrackObject>,
@@ -298,4 +266,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
