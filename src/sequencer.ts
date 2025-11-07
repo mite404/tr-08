@@ -78,9 +78,14 @@ export function createSequencer(
       onStep(currentStep);
     },
 
+    pause() {
+      transport.pause();
+    },
+
     updateBpm(newBpm: number) {
       transport.bpm.value = newBpm;
     },
+
     dispose() {
       transport.clear(scheduledEventId);
       transport.stop();

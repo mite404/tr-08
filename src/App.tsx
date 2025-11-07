@@ -362,6 +362,26 @@ function App() {
     }
   }
 
+  function handleStartStopClick() {
+    if (createSequencerRef.current !== null) {
+      if (
+        Tone.getTransport().state !== "started" &&
+        Tone.getTransport().state !== "paused"
+      ) {
+        if (!playersInitializedRef.current) {
+          initPlayers(tracks, setLoadedCount);
+          playersInitializedRef.current = true;
+        }
+        createSequencerRef.current.start();
+      } else if (
+        Tone.getTransport().state !== "stopped" &&
+        Tone.getTransport().state !== "paused"
+      ) {
+        createSequencerRef.current.stop();
+      }
+    }
+  }
+
   function handleIncrementBpm() {
     const newBpm = bpm + 1;
     setBpm(newBpm);
@@ -427,9 +447,8 @@ function App() {
               disabled={!allPlayersReady}
             />
             <PlayStopBtn
-              text="STOP"
               customStyles=""
-              onClick={handleStopClick}
+              onClick={handleStartStopClick}
               disabled={!allPlayersReady}
             />
           </div>
