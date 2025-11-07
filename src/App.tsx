@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type JSX } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
 import { TempoDisplay } from "./components/TempoDisplay";
@@ -271,6 +271,8 @@ function App() {
   const [loadedCount, setLoadedCount] = useState(0);
   const [allPlayersReady, setAllPlayersReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [beatName, setBeatName] = useState("TR-08");
+  const [isEditTitleActive, setIsEditTitleActive] = useState(false);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -386,6 +388,40 @@ function App() {
     }
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      const myInputValue = event.currentTarget.value;
+      setBeatName(myInputValue);
+      setIsEditTitleActive(false);
+      console.log(event);
+    }
+  }
+
+  function handleTitleClick() {
+    console.log("handle title click run");
+    setIsEditTitleActive(true);
+  }
+
+  function TitleComponent(): JSX.Element {
+    if (isEditTitleActive) {
+      return (
+        <input
+          onKeyDown={handleKeyDown}
+          placeholder="Enter name here..."
+        ></input>
+      );
+    } else {
+      return (
+        <h1
+          onClick={handleTitleClick}
+          className="stack-sans-notch-display1 text-7xl font-extralight"
+        >
+          {beatName}
+        </h1>
+      );
+    }
+  }
+
   return (
     // whole page container
     <div className="flex min-h-screen items-center justify-center bg-gray-950">
@@ -397,9 +433,7 @@ function App() {
             className="w-[200px] p-6"
             src="src/assets/images/MPC_mark.png"
           ></img>
-          <h1 className="stack-sans-notch-display1 text-7xl font-extralight">
-            TR-08
-          </h1>
+          {TitleComponent()}
         </div>
         {/* beat grid container */}
         <div className="rounded-md border-10 border-gray-900">
