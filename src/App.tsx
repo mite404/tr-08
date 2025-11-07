@@ -270,7 +270,7 @@ function App() {
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
-  const [allPlayersReady, setAllPlayersReady] = useState(true);
+  const [allPlayersReady, setAllPlayersReady] = useState(false);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -354,6 +354,7 @@ function App() {
       createSequencerRef.current.stop();
     } else {
       if (!playersInitializedRef.current) {
+        setAllPlayersReady(false);
         initPlayers(tracks, setLoadedCount);
         playersInitializedRef.current = true;
       }
