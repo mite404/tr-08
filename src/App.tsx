@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
-import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
@@ -270,7 +269,8 @@ function App() {
   const [grid, setGrid] = useState(initialGrid);
   const [currentStep, setCurrentStep] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
-  const [allPlayersReady, setAllPlayersReady] = useState(true);
+  const [allPlayersReady, setAllPlayersReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -345,20 +345,22 @@ function App() {
     setGrid(newGrid);
   }
 
-  function handlePlayClick() {
-    if (!playersInitializedRef.current) {
-      initPlayers(tracks, setLoadedCount);
-      playersInitializedRef.current = true;
-    }
+  function handleStartStopClick() {
+    if (createSequencerRef.current === null) return;
 
-    if (createSequencerRef.current) {
-      createSequencerRef.current.start();
-    }
-  }
+    const isPlaying = Tone.getTransport().state === "started";
 
-  function handleStopClick() {
-    if (createSequencerRef.current) {
+    if (isPlaying) {
       createSequencerRef.current.stop();
+    } else {
+      if (!playersInitializedRef.current) {
+        setIsLoading(true);
+        setAllPlayersReady(false);
+        initPlayers(tracks, setLoadedCount);
+        playersInitializedRef.current = true;
+        return;
+      }
+      createSequencerRef.current.start();
     }
   }
 
@@ -418,19 +420,12 @@ function App() {
           </div>
         </div>
         {/* control buttons container */}
-        <div className="grid grid-cols-2 gap-2 p-4 pt-4">
+        <div className="grid grid-cols-2 gap-2 p-6 pt-6">
           <div className="">
-            <Button
-              text="PLAY"
-              customStyles="mb-4"
-              onClick={handlePlayClick}
-              disabled={!allPlayersReady}
-            />
             <PlayStopBtn
-              text="STOP"
               customStyles=""
-              onClick={handleStopClick}
-              disabled={!allPlayersReady}
+              onClick={handleStartStopClick}
+              disabled={isLoading}
             />
           </div>
           {/* set tempo controls container */}
@@ -439,13 +434,6 @@ function App() {
               bpmValue={bpm}
               onIncrementClick={handleIncrementBpm}
               onDecrementClick={handleDecrementBpm}
-            />
-            <Button
-              text=" --- "
-              customStyles="mt-4"
-              onClick={() => {
-                console.log("set tempo clicked");
-              }}
             />
           </div>
         </div>

@@ -1,16 +1,10 @@
 type ButtonProps = {
-  text: string;
   customStyles: string;
   onClick: () => void;
   disabled?: boolean;
 };
 
-export function PlayStopBtn({
-  text,
-  customStyles,
-  onClick,
-  disabled,
-}: ButtonProps) {
+export function PlayStopBtn({ customStyles, onClick, disabled }: ButtonProps) {
   return (
     <div className="rounded-lg bg-yellow-200 p-1">
       <button

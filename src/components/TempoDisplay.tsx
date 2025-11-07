@@ -13,14 +13,16 @@ export function TempoDisplay({
     // BPM Display
     <div className="flex w-full">
       <div
-        className={`h-10 grow items-center rounded-tl-lg rounded-bl-lg bg-red-950 px-4`}
+        className={`flex h-14 grow flex-col items-center justify-center rounded-tl-lg rounded-bl-lg bg-red-950 px-4`}
       >
-        <span className="text-sm text-red-600">BPM</span>
-        <span className="text-3xl font-bold text-red-600">{bpmValue}</span>
+        <div className="">
+          <span className="text-sm text-red-600">TEMPO</span>
+          <span className="text-5xl font-bold text-red-600">{bpmValue}</span>
+        </div>
       </div>
 
       {/* arrow container */}
-      <div className="flex h-10 flex-col">
+      <div className="flex h-14 flex-col">
         <button
           className="flex h-1/2 w-10 cursor-pointer items-center justify-center rounded-tr-lg border-b bg-gray-500 p-0 text-sm select-none hover:opacity-80"
           onClick={onIncrementClick}
