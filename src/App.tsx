@@ -390,10 +390,16 @@ function App() {
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
-      const myInputValue = event.currentTarget.value;
-      setBeatName(myInputValue);
+      const userInput = event.currentTarget.value;
+
+      if (userInput.trim() === "") {
+        return;
+      }
+      setBeatName(userInput);
       setIsEditTitleActive(false);
       console.log(event);
+    } else if (event.key === "Escape") {
+      setIsEditTitleActive(false);
     }
   }
 
@@ -402,12 +408,14 @@ function App() {
     setIsEditTitleActive(true);
   }
 
-  function TitleComponent(): JSX.Element {
+  function getDisplayTitle(): JSX.Element {
     if (isEditTitleActive) {
       return (
         <input
+          className="text-4xl"
+          maxLength="25"
           onKeyDown={handleKeyDown}
-          placeholder="Enter name here..."
+          placeholder="Enter name..."
         ></input>
       );
     } else {
@@ -433,7 +441,7 @@ function App() {
             className="w-[200px] p-6"
             src="src/assets/images/MPC_mark.png"
           ></img>
-          {TitleComponent()}
+          {getDisplayTitle()}
         </div>
         {/* beat grid container */}
         <div className="rounded-md border-10 border-gray-900">
