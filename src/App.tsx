@@ -438,14 +438,8 @@ function App() {
           </div>
         </div>
         {/* control buttons container */}
-        <div className="grid grid-cols-2 gap-2 p-4 pt-4">
+        <div className="grid grid-cols-2 gap-2 p-6 pt-6">
           <div className="">
-            <Button
-              text="PLAY"
-              customStyles="mb-4"
-              onClick={handlePlayClick}
-              disabled={!allPlayersReady}
-            />
             <PlayStopBtn
               customStyles=""
               onClick={handleStartStopClick}
@@ -458,13 +452,6 @@ function App() {
               bpmValue={bpm}
               onIncrementClick={handleIncrementBpm}
               onDecrementClick={handleDecrementBpm}
-            />
-            <Button
-              text=" --- "
-              customStyles="mt-4"
-              onClick={() => {
-                console.log("set tempo clicked");
-              }}
             />
           </div>
         </div>
