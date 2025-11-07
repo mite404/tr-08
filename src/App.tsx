@@ -360,7 +360,11 @@ function App() {
         playersInitializedRef.current = true;
         return;
       }
-      createSequencerRef.current.start();
+      if (allPlayersReady) {
+        createSequencerRef.current.start();
+      } else {
+        setIsLoading(true);
+      }
     }
   }
 
