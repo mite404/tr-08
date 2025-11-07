@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
-import { Button } from "./components/Button";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
@@ -271,6 +270,7 @@ function App() {
   const [currentStep, setCurrentStep] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
   const [allPlayersReady, setAllPlayersReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -354,9 +354,11 @@ function App() {
       createSequencerRef.current.stop();
     } else {
       if (!playersInitializedRef.current) {
+        setIsLoading(true);
         setAllPlayersReady(false);
         initPlayers(tracks, setLoadedCount);
         playersInitializedRef.current = true;
+        return;
       }
       createSequencerRef.current.start();
     }
@@ -423,7 +425,7 @@ function App() {
             <PlayStopBtn
               customStyles=""
               onClick={handleStartStopClick}
-              disabled={!allPlayersReady}
+              disabled={isLoading}
             />
           </div>
           {/* set tempo controls container */}
