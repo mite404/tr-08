@@ -345,40 +345,19 @@ function App() {
     setGrid(newGrid);
   }
 
-  function handlePlayClick() {
-    if (!playersInitializedRef.current) {
-      initPlayers(tracks, setLoadedCount);
-      playersInitializedRef.current = true;
-    }
-
-    if (createSequencerRef.current) {
-      createSequencerRef.current.start();
-    }
-  }
-
-  function handleStopClick() {
-    if (createSequencerRef.current) {
-      createSequencerRef.current.stop();
-    }
-  }
-
   function handleStartStopClick() {
-    if (createSequencerRef.current !== null) {
-      if (
-        Tone.getTransport().state !== "started" &&
-        Tone.getTransport().state !== "paused"
-      ) {
-        if (!playersInitializedRef.current) {
-          initPlayers(tracks, setLoadedCount);
-          playersInitializedRef.current = true;
-        }
-        createSequencerRef.current.start();
-      } else if (
-        Tone.getTransport().state !== "stopped" &&
-        Tone.getTransport().state !== "paused"
-      ) {
-        createSequencerRef.current.stop();
+    if (createSequencerRef.current === null) return;
+
+    const isPlaying = Tone.getTransport().state === "started";
+
+    if (isPlaying) {
+      createSequencerRef.current.stop();
+    } else {
+      if (!playersInitializedRef.current) {
+        initPlayers(tracks, setLoadedCount);
+        playersInitializedRef.current = true;
       }
+      createSequencerRef.current.start();
     }
   }
 
