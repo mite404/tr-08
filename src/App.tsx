@@ -5,6 +5,7 @@ import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
 import { PlayStopBtn } from "./components/PlayStopBtn";
+import mpcMark from "./assets/images/MPC_mark.png";
 
 export type TrackObject = {
   name: string;
@@ -438,10 +439,7 @@ function App() {
       <div className="rounded-xl bg-gray-600 p-4 pt-12 pr-8 pb-8 pl-8">
         {/* HEADER container */}
         <div className="flex items-center">
-          <img
-            className="w-[200px] p-6"
-            src="src/assets/images/MPC_mark.png"
-          ></img>
+          <img className="w-[200px] p-6" src={mpcMark} alt="TR-08 Mark"></img>
           {getDisplayTitle()}
         </div>
         {/* beat grid container */}
