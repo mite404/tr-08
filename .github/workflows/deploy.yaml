@@ -21,6 +21,9 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Install Vercel CLI
+        run: bun add -g vercel
+
       - name: Deploy to Vercel
         uses: BetaHuhn/deploy-to-vercel-action@v1
         with:
