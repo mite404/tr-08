@@ -5,6 +5,7 @@ import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
 import { PlayStopBtn } from "./components/PlayStopBtn";
+import mpcMark from "./assets/images/MPC_mark.png";
 
 export type TrackObject = {
   name: string;
@@ -199,52 +200,60 @@ const initialGrid = [
 const tracks = [
   {
     name: "KICK 01",
-    sound: "src/assets/samples/KICK01.wav",
+    sound: new URL("./assets/samples/KICK01.wav", import.meta.url).href,
     color: "bg-red-900",
   },
   {
     name: "KICK 20",
-    sound: "src/assets/samples/KICK02.wav",
+    sound: new URL("./assets/samples/KICK02.wav", import.meta.url).href,
     color: "bg-red-900",
   },
   {
     name: "BASS 01",
-    sound: "src/assets/samples/Bass_Tone_C_013.wav",
+    sound: new URL("./assets/samples/Bass_Tone_C_013.wav", import.meta.url)
+      .href,
     color: "bg-orange-800",
   },
   {
     name: "BASS 02",
-    sound: "src/assets/samples/BASS01.wav",
+    sound: new URL("./assets/samples/BASS01.wav", import.meta.url).href,
     color: "bg-orange-800",
   },
   {
     name: "SNARE 01",
-    sound: "src/assets/samples/JA_SNARE_1.wav",
+    sound: new URL("./assets/samples/Bh_Hit_Clap_0007.wav", import.meta.url)
+      .href,
     color: "bg-yellow-800",
   },
   {
     name: "SNARE 02",
-    sound: "src/assets/samples/JA_SNARE_2.wav",
+    sound: new URL("./assets/samples/JA_SNARE_2.wav", import.meta.url).href,
     color: "bg-yellow-800",
   },
   {
     name: "SYNTH 01",
-    sound: "src/assets/samples/Stabs_&_Chords_016_Dm.wav",
+    sound: new URL(
+      "./assets/samples/Stabs_&_Chords_016_Dm.wav",
+      import.meta.url,
+    ).href,
     color: "bg-yellow-900",
   },
   {
-    name: "SYNTH 02",
-    sound: "src/assets/samples/Stabs_&_Chords_028_C.wav",
+    name: "CLAP",
+    sound: new URL("./assets/samples/Stabs_&_Chords_028_C.wav", import.meta.url)
+      .href,
     color: "bg-yellow-900",
   },
   {
     name: "HH 01",
-    sound: "src/assets/samples/Bh_Hit_Hihat_0008.wav",
+    sound: new URL("./assets/samples/Bh_Hit_Hihat_0008.wav", import.meta.url)
+      .href,
     color: "bg-orange-950",
   },
   {
     name: "HH 02",
-    sound: "src/assets/samples/Bh_Hit_Hihat_0009.wav",
+    sound: new URL("./assets/samples/Bh_Hit_Hihat_0009.wav", import.meta.url)
+      .href,
     color: "bg-orange-950",
   },
 ];
@@ -438,10 +447,7 @@ function App() {
       <div className="rounded-xl bg-gray-600 p-4 pt-12 pr-8 pb-8 pl-8">
         {/* HEADER container */}
         <div className="flex items-center">
-          <img
-            className="w-[200px] p-6"
-            src="src/assets/images/MPC_mark.png"
-          ></img>
+          <img className="w-[200px] p-6" src={mpcMark} alt="TR-08 Mark"></img>
           {getDisplayTitle()}
         </div>
         {/* beat grid container */}
