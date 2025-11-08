@@ -7,6 +7,18 @@ import * as Tone from "tone";
 import { PlayStopBtn } from "./components/PlayStopBtn";
 import mpcMark from "./assets/images/MPC_mark.png";
 
+// Import all audio samples directly so Vite bundles them correctly for production
+import KICK01 from "./assets/samples/KICK01.wav";
+import KICK02 from "./assets/samples/KICK02.wav";
+import BassToneC013 from "./assets/samples/Bass_Tone_C_013.wav";
+import BASS01 from "./assets/samples/BASS01.wav";
+import BhHitClap0007 from "./assets/samples/Bh_Hit_Clap_0007.wav";
+import JASnare2 from "./assets/samples/JA_SNARE_2.wav";
+import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
+import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
+import BhHitHihat0008 from "./assets/samples/Bh_Hit_Hihat_0008.wav";
+import BhHitHihat0009 from "./assets/samples/Bh_Hit_Hihat_0009.wav";
+
 export type TrackObject = {
   name: string;
   sound: string;
@@ -200,60 +212,52 @@ const initialGrid = [
 const tracks = [
   {
     name: "KICK 01",
-    sound: new URL("./assets/samples/KICK01.wav", import.meta.url).href,
+    sound: KICK01,
     color: "bg-red-900",
   },
   {
     name: "KICK 20",
-    sound: new URL("./assets/samples/KICK02.wav", import.meta.url).href,
+    sound: KICK02,
     color: "bg-red-900",
   },
   {
     name: "BASS 01",
-    sound: new URL("./assets/samples/Bass_Tone_C_013.wav", import.meta.url)
-      .href,
+    sound: BassToneC013,
     color: "bg-orange-800",
   },
   {
     name: "BASS 02",
-    sound: new URL("./assets/samples/BASS01.wav", import.meta.url).href,
+    sound: BASS01,
     color: "bg-orange-800",
   },
   {
     name: "SNARE 01",
-    sound: new URL("./assets/samples/Bh_Hit_Clap_0007.wav", import.meta.url)
-      .href,
+    sound: BhHitClap0007,
     color: "bg-yellow-800",
   },
   {
     name: "SNARE 02",
-    sound: new URL("./assets/samples/JA_SNARE_2.wav", import.meta.url).href,
+    sound: JASnare2,
     color: "bg-yellow-800",
   },
   {
     name: "SYNTH 01",
-    sound: new URL(
-      "./assets/samples/Stabs_&_Chords_016_Dm.wav",
-      import.meta.url,
-    ).href,
+    sound: StabsChords016Dm,
     color: "bg-yellow-900",
   },
   {
     name: "CLAP",
-    sound: new URL("./assets/samples/Stabs_&_Chords_028_C.wav", import.meta.url)
-      .href,
+    sound: StabsChords028C,
     color: "bg-yellow-900",
   },
   {
     name: "HH 01",
-    sound: new URL("./assets/samples/Bh_Hit_Hihat_0008.wav", import.meta.url)
-      .href,
+    sound: BhHitHihat0008,
     color: "bg-orange-950",
   },
   {
     name: "HH 02",
-    sound: new URL("./assets/samples/Bh_Hit_Hihat_0009.wav", import.meta.url)
-      .href,
+    sound: BhHitHihat0009,
     color: "bg-orange-950",
   },
 ];
