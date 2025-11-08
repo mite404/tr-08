@@ -298,6 +298,7 @@ function App() {
       sequencer.dispose();
       createSequencerRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // check if all players have loaded their samples
@@ -413,7 +414,7 @@ function App() {
       return (
         <input
           className="text-4xl"
-          maxLength="25"
+          maxLength={25}
           onKeyDown={handleKeyDown}
           placeholder="Enter name..."
         ></input>
@@ -451,6 +452,8 @@ function App() {
               return track.map((_, colIndex) => {
                 return (
                   <Pad
+                    // eslint-disable-next-line react-x/no-array-index-key
+                    key={`${rowIndex}-${colIndex}`}
                     color={getActiveColor(
                       tracks[rowIndex].color,
                       grid[rowIndex][colIndex],
