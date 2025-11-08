@@ -470,7 +470,7 @@ function App() {
                     )}
                     isActive={grid[rowIndex][colIndex]}
                     isCurrentStep={colIndex === currentStep}
-                    is16thNote={colIndex % 2 === 0}
+                    is16thNote={colIndex % 4 !== 0}
                     onClick={() => handlePadClick(rowIndex, colIndex)}
                   />
                 );
