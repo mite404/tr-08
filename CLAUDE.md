@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**TR-08** is a drum machine / beat sequencer web application built with React, TypeScript, and Vite. It provides a visual 8-step sequencer grid where users can program drum patterns across 10 instrument tracks, control BPM (tempo), and play back the sequences.
+**TR-08** is a drum machine / beat sequencer web application built with React, TypeScript, Vite, and Tone.js. It provides a visual 16-step sequencer grid where users can program drum patterns across 10 instrument tracks, control BPM (tempo), play back sequences, and save beats with custom names. The UI mimics physical hardware (Roland TR-08 style).
 
 ## Build & Development Commands
 
@@ -21,9 +21,11 @@ npm run preview      # Preview production build locally
 
 The application uses **React hooks** with a functional component architecture. Key state management happens in `App.tsx`:
 
-1. **Grid State** (`grid`): A 10×8 2D array of booleans representing which tracks should play at which steps
-2. **BPM State** (`bpm`): Current tempo in beats per minute
-3. **Current Step** (`currentStep`): Which of the 8 steps is currently being played (0-7)
+1. **Grid State** (`grid`): A 10×16 2D array of booleans representing which tracks should play at which steps
+2. **BPM State** (`bpm`): Current tempo in beats per minute (default: 140)
+3. **Current Step** (`currentStep`): Which of the 16 steps is currently being played (0-15)
+4. **Beat Name** (`beatName`): User-defined name for the sequence (default: "TR-08", max 25 chars)
+5. **Loading State** (`loadedCount`, `allPlayersReady`, `isLoading`): Tracks audio sample loading
 
 **Grid Structure:**
 
@@ -32,48 +34,121 @@ grid[trackIndex][stepIndex] = boolean
 ```
 
 - 10 tracks (rows): Different drum sounds (kicks, bass, snare, synth, hi-hat)
-- 8 steps (columns): One bar divided into 8 positions
+- 16 steps (columns): One bar divided into 16 positions (4 beats of 4 16th notes each)
 - `true` = sound plays at this step, `false` = silent
+
+**Audio Players:**
+- Each track has a `player` property (Tone.Player instance) added dynamically
+- Players are initialized on first play (lazy loading) via `initPlayers()` function
+- Loading state prevents playback until all samples are loaded (or allows continuation if some fail)
+- Error handling: samples that fail to load don't block sequencer startup
 
 ### Sequencer Engine (`src/sequencer.ts`)
 
 The `createSequencer()` function is the core timing engine:
 
-- Uses `setInterval()` with an interval calculated from BPM: `60000 / bpm` milliseconds
+- Uses **Tone.js Transport** for precise timing (not simple setInterval)
+- Schedules playback at "16n" (16th note) interval
 - Manages playback state: `start()`, `stop()`, `updateBpm()`
-- Calls the `onStep` callback function each beat, passing the current step number
-- Returns an object with three methods for controlling playback
+- Calls the `onStep` callback function each 16th note, passing the current step number (0-15)
+- Returns an object with methods for controlling playback
 
-**Important Detail:** When `updateBpm()` is called while playing, it clears the old interval and creates a new one to maintain smooth playback.
+**Important Detail:** The sequencer operates at 16th note resolution, so a full bar is 16 steps rather than 8.
+
+### Audio Assets (`src/assets/samples/`)
+
+Audio samples are **imported as ES modules** (Commit #21) for production deployment:
+
+```typescript
+import KICK01 from "./assets/samples/KICK01.wav";
+import KICK02 from "./assets/samples/KICK02.wav";
+import Bass_Tone_C_013 from "./assets/samples/Bass_Tone_C_013.wav";
+import BASS01 from "./assets/samples/BASS01.wav";
+import Bh_Hit_Clap_0007 from "./assets/samples/Bh_Hit_Clap_0007.wav";
+import JA_SNARE_2 from "./assets/samples/JA_SNARE_2.wav";
+import Stabs_Chords_016_Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
+import Stabs_Chords_028_C from "./assets/samples/Stabs_&_Chords_028_C.wav";
+import Bh_Hit_Hihat_0008 from "./assets/samples/Bh_Hit_Hihat_0008.wav";
+import Bh_Hit_Hihat_0009 from "./assets/samples/Bh_Hit_Hihat_0009.wav";
+```
+
+**Benefits:**
+- Vite bundles samples into production build
+- No network requests needed in production
+- Reliable for deployed applications
+- Proper asset handling during build process
 
 ### Component Architecture
 
 All UI components are functional components with TypeScript prop types:
 
 - **`Pad.tsx`**: Individual grid button (one pad = one track × one step)
-  - Props: `color`, `isActive`, `isCurrentStep`, `onClick`
-  - Styling: Opacity indicates active/inactive; brightness indicates current playhead position
+  - Props: `color`, `isActive`, `isCurrentStep`, `is16thNote`, `onClick`
+  - Styling: Opacity indicates active/inactive; brightness indicates playhead position and 16th note distinction
+  - 16th notes (every step not divisible by 4) have slightly reduced brightness for visual distinction (Commit #22)
 
 - **`Button.tsx`**: Reusable control button for PLAY, STOP, SET TEMPO
   - Props: `text`, `customStyles`, `onClick`
 
+- **`PlayStopBtn.tsx`**: Enhanced play/stop toggle with divided visual design
+  - Shows START and STOP as separate visual sections
+  - Indicates current playback state
+
 - **`TempoDisplay.tsx`**: BPM display with increment/decrement arrows
   - Props: `bpmValue`, `onIncrementClick`, `onDecrementClick`
+  - Allows real-time BPM adjustment during playback
 
 ### Data Flow
 
 1. User clicks a pad → `handlePadClick()` in App.tsx
-2. `togglePad()` in sequencer.ts creates a new grid with toggled state
+2. `togglePad()` in App.tsx creates a new grid with toggled state
 3. Grid state updates → re-renders all Pad components
-4. Separately, sequencer callback fires on each step → updates `currentStep` state
-5. Current step affects visual styling (brightness) of pads
+4. Separately, sequencer callback fires on each 16th note → updates `currentStep` state
+5. Current step affects visual styling (brightness-175) of pads
+6. 16th notes (steps 1-3, 5-7, 9-11, 13-15) have brightness-135 for visual distinction
+7. When user clicks Play, `initPlayers()` loads all audio samples asynchronously
+8. Once samples are ready (or after timeout), sequencer starts and `onStep` callback updates UI
+
+### Beat Name / Display Name Feature
+
+Users can customize the beat name (Commit #18):
+
+- Click the title to enter edit mode
+- Type a new name (max 25 characters)
+- Press Enter to save, Escape to cancel
+- Default name: "TR-08"
+- Name persists in component state during session
+
+**Implementation:**
+```typescript
+const [beatName, setBeatName] = useState("TR-08");
+const [isEditTitleActive, setIsEditTitleActive] = useState(false);
+
+function getDisplayTitle(): JSX.Element {
+  // Returns either input field or h1 heading based on isEditTitleActive
+}
+```
 
 ### Styling
 
-- **Tailwind CSS** for all styling (via `@tailwindcss/vite` plugin)
-- **Color mapping system**: `colorMap` in App.tsx maps dark Tailwind colors to bright equivalents for active states
+- **Tailwind CSS v4** for all styling (via `@tailwindcss/vite` plugin)
+- **Color mapping system**: Each track has a distinct Tailwind dark color
 - **Device mockup**: Outer gray container simulates physical hardware aesthetic
-- Grid uses CSS Grid (`grid-cols-8`) for layout
+- **Grid layout**: CSS Grid with 16 columns (`grid-cols-16`)
+- **Custom font**: Stack Sans Notch (imported from Google Fonts)
+- **Pad brightness states:**
+  - Current playhead position: `brightness-175` (very bright)
+  - 16th notes: `brightness-135` (slightly dimmed)
+  - Active pads: `opacity-100`
+  - Inactive pads: `opacity-50`
+  - Hover: `opacity-80`
+
+### Sequencer Timing & Playback
+
+- BPM updates are applied in real-time during playback
+- Transport is used to schedule note triggering at precise intervals
+- Playback cycles through 16 steps, then repeats
+- `gridRef.current` pattern ensures sequencer callback has access to latest grid state
 
 ## TypeScript Configuration
 
@@ -84,13 +159,16 @@ Strict mode is enabled (`"strict": true`). Key compiler options:
 - JSX: react-jsx
 - Linting rules enforce no unused locals/parameters
 - No unchecked side effect imports
+- `lib: ["ES2020", "DOM", "DOM.Iterable"]`
 
 ## Dependencies
 
-- **`react` & `react-dom`**: UI framework
-- **`tone.js`**: For audio playback
-- **Tailwind CSS**: Utility-first styling
-- **Vite**: Build tool with React plugin
+- **`react@^19.1.1` & `react-dom@^19.1.1`**: UI framework
+- **`tone@^15.1.22`**: For audio playback and timing
+- **`tailwindcss@^4.1.16` & `@tailwindcss/vite@^4.1.16`**: Utility-first styling
+- **`vite@^7.1.7`**: Build tool with React plugin
+- **`typescript~5.9.3`**: Type safety
+- **`eslint@^9.36.0` & `typescript-eslint`**: Code quality
 
 ## ESLint Configuration
 
@@ -101,11 +179,46 @@ Uses recommended configs for:
 - React Hooks (`eslint-plugin-react-hooks`)
 - React Refresh (`eslint-plugin-react-refresh`)
 
-No type-aware lint rules are enabled yet (would require project references in ESLint config).
-
 ## Development Notes
 
-- Use `gridRef.current` pattern to pass fresh grid state to the sequencer callback (App.tsx:69-71)
-- The `structuredClone()` function is used in `togglePad()` to create immutable updates
-- Sequencer interval is re-calculated each time BPM changes while playing to maintain timing accuracy
-- Color switching uses a map lookup pattern; consider adding new colors here when adding new track types
+- **Module Imports for Audio**: Audio samples are imported as ES modules at the top of App.tsx, not fetched dynamically
+- **Lazy Loading**: Players are initialized only on first play via `initPlayers()` to avoid blocking initial load
+- **16-Step Sequencer**: The grid is 16 steps (not 8). Use `colIndex % 4 !== 0` to determine 16th note positions
+- **Grid Updates**: Use `structuredClone()` to create immutable grid updates in `togglePad()`
+- **Playhead Ref Pattern**: Use `gridRef.current` to pass fresh grid state to the sequencer callback
+- **Color System**: Track colors are defined in the `tracks` array; add new colors by extending Tailwind color palette
+- **BPM Bounds**: BPM is clamped between 40 and 300 to avoid timing issues
+- **Error Handling**: Failed audio samples are logged but don't prevent sequencer startup
+
+## File Structure
+
+```
+src/
+├── App.tsx                      # Main application, state management
+├── sequencer.ts                 # Core timing engine (Tone.js Transport)
+├── main.tsx                     # React entry point
+├── App.css                      # App-specific styles
+├── index.css                    # Global styles with Tailwind
+├── components/
+│   ├── Pad.tsx                  # Individual grid pad (16 columns × 10 rows)
+│   ├── PlayStopBtn.tsx          # Play/Stop toggle button
+│   ├── Button.tsx               # Reusable button component
+│   └── TempoDisplay.tsx         # BPM display with +/- controls
+├── assets/
+│   ├── images/
+│   │   └── MPC_mark.png         # TR-08 branding image
+│   └── samples/                 # 10 audio WAV files (imported as modules)
+│       ├── KICK01.wav, KICK02.wav
+│       ├── Bass_Tone_C_013.wav, BASS01.wav
+│       ├── Bh_Hit_Clap_0007.wav, JA_SNARE_2.wav
+│       ├── Stabs_&_Chords_016_Dm.wav, Stabs_&_Chords_028_C.wav
+│       └── Bh_Hit_Hihat_0008.wav, Bh_Hit_Hihat_0009.wav
+```
+
+## Recent Changes & Commits
+
+- **Commit #22**: "Update `Pad` component to only dim 16th notes" - Added visual distinction for 16th note steps
+- **Commit #21**: "Import audio samples as modules for production deployment" - Changed from dynamic fetching to ES module imports
+- **Commit #18**: "Add Customized Display Name" - Added ability to click and edit beat name
+- **Commit #20**: "Update `MPC_mark.png` to relative path" - Fixed asset path handling
+- **Commit #19**: "Add superlinter/CI prep" - Added CI/CD configuration
