@@ -2,11 +2,12 @@ import { useEffect, useRef, useState, type JSX } from "react";
 import "./App.css";
 import { Pad } from "./components/Pad";
 import { TempoDisplay } from "./components/TempoDisplay";
+import { PlayStopBtn } from "./components/PlayStopBtn";
 import { createSequencer, togglePad } from "./sequencer";
 import * as Tone from "tone";
-import { PlayStopBtn } from "./components/PlayStopBtn";
-import mpcMark from "./assets/images/MPC_mark.png";
+import { createClient } from "@supabase/supabase-js";
 
+import mpcMark from "./assets/images/MPC_mark.png";
 // Import all audio samples directly so Vite bundles them correctly for production
 import KICK01 from "./assets/samples/KICK01.wav";
 import KICK02 from "./assets/samples/KICK02.wav";
@@ -277,6 +278,16 @@ const colorMap: { [key: string]: string } = {
   "bg-purple-900": "bg-purple-500",
 };
 
+type Instrument = {
+  id: number;
+  name: string;
+};
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL as string,
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+);
+
 function App() {
   const [bpm, setBpm] = useState(140);
   const [grid, setGrid] = useState(initialGrid);
@@ -289,6 +300,27 @@ function App() {
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
+  const [instruments, setInstruments] = useState<Array<Instrument>>([]);
+
+  useEffect(() => {
+    const instrumentsWrapper = async () => {
+      await getInstruments();
+    };
+    void instrumentsWrapper();
+  }, []);
+
+  async function getInstruments() {
+    let response: Array<Instrument> | null = [];
+    const { data, error } = await supabase.from("instruments").select("*");
+
+    if (data) {
+      response = data;
+      setInstruments(response);
+      console.log(response);
+    } else {
+      console.error("There was an issue:", error);
+    }
+  }
 
   // giving callback in createSequencer fresh state of grid
   useEffect(() => {
@@ -495,6 +527,13 @@ function App() {
               onDecrementClick={handleDecrementBpm}
             />
           </div>
+        </div>
+        <div>
+          <ul>
+            {instruments.map((instrument) => (
+              <li key={instrument.name}>{instrument.name}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
