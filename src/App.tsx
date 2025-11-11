@@ -436,7 +436,7 @@ function App() {
       return (
         <h1
           onClick={handleTitleClick}
-          className="stack-sans-notch-display1 text-7xl font-extralight"
+          className="stack-sans-notch-display1 cursor-pointer text-7xl font-extralight"
         >
           {beatName}
         </h1>
