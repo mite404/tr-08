@@ -1,23 +1,23 @@
 import { useEffect, useRef, useState, type JSX } from "react";
+import * as Tone from "tone";
 import "./App.css";
+import mpcMark from "./assets/images/MPC_mark.png";
 import { Pad } from "./components/Pad";
+import { PlayStopBtn } from "./components/PlayStopBtn";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
-import * as Tone from "tone";
-import { PlayStopBtn } from "./components/PlayStopBtn";
-import mpcMark from "./assets/images/MPC_mark.png";
 
 // Import all audio samples directly so Vite bundles them correctly for production
-import KICK01 from "./assets/samples/KICK01.wav";
-import KICK02 from "./assets/samples/KICK02.wav";
-import BassToneC013 from "./assets/samples/Bass_Tone_C_013.wav";
 import BASS01 from "./assets/samples/BASS01.wav";
+import BassToneC013 from "./assets/samples/Bass_Tone_C_013.wav";
 import BhHitClap0007 from "./assets/samples/Bh_Hit_Clap_0007.wav";
-import JASnare2 from "./assets/samples/JA_SNARE_2.wav";
-import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
-import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
 import BhHitHihat0008 from "./assets/samples/Bh_Hit_Hihat_0008.wav";
 import BhHitHihat0009 from "./assets/samples/Bh_Hit_Hihat_0009.wav";
+import JASnare2 from "./assets/samples/JA_SNARE_2.wav";
+import KICK01 from "./assets/samples/KICK01.wav";
+import KICK02 from "./assets/samples/KICK02.wav";
+import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
+import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
 
 export type TrackObject = {
   name: string;
@@ -331,6 +331,7 @@ function App() {
 
       const player = new Tone.Player({
         url: trackPath,
+        volume: -5, // starting volume of all initial players
         onload: () => {
           setLoadedCount((prev) => {
             console.log("loadedCount:", prev + 1);
