@@ -445,6 +445,17 @@ function App() {
     }
   }
 
+  const dbToConvert = -3;
+  getKnobRotation(dbToConvert);
+
+  function getKnobRotation(dbToConvert: number) {
+    const startingAngle = 320; // -4dB starting knob position in degrees
+    const rotationAngle = (dbToConvert + 20) * (350 / 25) + startingAngle;
+
+    console.log(`Rotation Angle: ${rotationAngle}`);
+    return rotationAngle;
+  }
+
   return (
     // whole page container
     <div className="flex min-h-screen items-center justify-center bg-gray-950">
