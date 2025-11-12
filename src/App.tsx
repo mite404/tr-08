@@ -287,7 +287,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [beatName, setBeatName] = useState("TR-08");
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
-  const KNOB_STARTING_ANGLE = 320; // -4dB starting knob position in degrees
+  const KNOB_STARTING_ANGLE = 320; // -5dB starting knob position in degrees
   const initialVolumeDb = -5;
   const [knobAngle, setKnobAngle] = useState(() =>
     getKnobRotation(initialVolumeDb),

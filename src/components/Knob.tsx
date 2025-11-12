@@ -9,21 +9,18 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
   const knobLineOffset = -130;
   const renderKnob = rotationAngle + knobLineOffset;
-  const maxKnobVal = 270;
+  const maxKnobVal = 256;
   const minKnobVal = 10;
-
-  console.log("Rotation Angle:", rotationAngle);
 
   useEffect(() => {
     function handleWindowMouseMove(event: MouseEvent) {
-      let newAngle = 0;
+      let newAngle = rotationAngle + event.movementY;
 
-      if (rotationAngle > maxKnobVal && event.movementY > 0) {
+      // possible oneliner solution: newAngle = Math.max(10, Math.min(270, newAngle))
+      if (newAngle > maxKnobVal) {
         newAngle = maxKnobVal;
-      } else if (rotationAngle <= minKnobVal && event.movementY <= 0) {
+      } else if (newAngle < minKnobVal) {
         newAngle = minKnobVal;
-      } else {
-        newAngle = rotationAngle + event.movementY;
       }
 
       onDrag(newAngle);
@@ -39,10 +36,10 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
     }
 
     return () => {
-      (window.removeEventListener("mousemove", handleWindowMouseMove),
-        window.removeEventListener("mouseup", handleWindowMouseUp));
+      window.removeEventListener("mousemove", handleWindowMouseMove);
+      window.removeEventListener("mouseup", handleWindowMouseUp);
     };
-  }, [isDragging, onDrag]);
+  }, [isDragging, onDrag, rotationAngle]); // rotationAngle needed to be added for fresh value
 
   function handleMouseDown() {
     setIsDragging(true);
