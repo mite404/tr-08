@@ -453,23 +453,30 @@ function App() {
 
   function handleKnobValueChange(newAngleFromKnob: number) {
     setKnobAngle(newAngleFromKnob); // update knob angle state
-    getDbFromRotation(newAngleFromKnob, KNOB_STARTING_ANGLE); // update audio
+    getDbFromRotation(newAngleFromKnob); // update audio
   }
 
   function getKnobRotation(newAngle: number): number {
     return (newAngle + 20) * (350 / 25) + KNOB_STARTING_ANGLE;
   }
 
-  function getDbFromRotation(rotationAngle: number, startingAngle: number) {
-    const dbValue = (rotationAngle - startingAngle) / (350 / 25) - 20;
-    console.log(
-      "dbValue: ",
-      dbValue,
-      "rotationAngle: ",
-      rotationAngle,
-      "startingAngle: ",
-      startingAngle,
-    );
+  function getDbFromRotation(rotationAngle: number) {
+    // const dbValue = (rotationAngle - startingAngle) / (350 / 25) - 20;
+
+    // in degrees
+    const inputMin = 10;
+    const inputMax = 256;
+
+    // in dBs
+    const outputMax = 5;
+    const outputMin = -25;
+
+    const dbValue =
+      ((rotationAngle - inputMin) / (inputMax - inputMin)) *
+        (outputMax - outputMin) +
+      outputMin;
+
+    console.log("dbValue: ", dbValue, "rotationAngle: ", rotationAngle);
 
     return dbValue;
   }
