@@ -18,6 +18,7 @@ import KICK01 from "./assets/samples/KICK01.wav";
 import KICK02 from "./assets/samples/KICK02.wav";
 import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
 import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
+import { Knob } from "./components/Knob";
 
 export type TrackObject = {
   name: string;
@@ -286,6 +287,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [beatName, setBeatName] = useState("TR-08");
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
+  const KNOB_STARTING_ANGLE = 320; // -4dB starting knob position in degrees
+  const initialVolumeDb = -5;
+  const [knobAngle, setKnobAngle] = useState(() =>
+    getKnobRotation(initialVolumeDb),
+  );
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -308,8 +314,8 @@ function App() {
     createSequencerRef.current = sequencer;
 
     return () => {
-      sequencer.dispose();
-      createSequencerRef.current = null;
+      sequencer.dispose(); // clear upcoming transport scheduled events, prep sequencer obj for deletion
+      createSequencerRef.current = null; // unalive sequencer reference object
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -445,15 +451,28 @@ function App() {
     }
   }
 
-  const dbToConvert = -3;
-  getKnobRotation(dbToConvert);
+  function handleKnobValueChange(newAngleFromKnob: number) {
+    setKnobAngle(newAngleFromKnob); // update knob angle state
+    getDbFromRotation(newAngleFromKnob, KNOB_STARTING_ANGLE); // update audio
+  }
 
-  function getKnobRotation(dbToConvert: number) {
-    const startingAngle = 320; // -4dB starting knob position in degrees
-    const rotationAngle = (dbToConvert + 20) * (350 / 25) + startingAngle;
+  function getKnobRotation(dbToConvert: number): number {
+    let rotationAngle = (dbToConvert + 20) * (350 / 25) + KNOB_STARTING_ANGLE;
 
-    console.log(`Rotation Angle: ${rotationAngle}`);
-    return rotationAngle;
+    // TODO: refactor clamp for UI tmrow
+    if (rotationAngle < 10) {
+      return (rotationAngle = 10);
+    } else if (rotationAngle > 270) {
+      return (rotationAngle = 270);
+    } else {
+      return rotationAngle;
+    }
+  }
+
+  function getDbFromRotation(rotationAngle: number, startingAngle: number) {
+    const dbValue = (rotationAngle - startingAngle) / (350 / 25) - 20;
+
+    return dbValue;
   }
 
   return (
@@ -507,6 +526,7 @@ function App() {
               onDecrementClick={handleDecrementBpm}
             />
           </div>
+          <Knob rotationAngle={knobAngle} onDrag={handleKnobValueChange} />
         </div>
       </div>
     </div>
