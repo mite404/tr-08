@@ -456,21 +456,20 @@ function App() {
     getDbFromRotation(newAngleFromKnob, KNOB_STARTING_ANGLE); // update audio
   }
 
-  function getKnobRotation(dbToConvert: number): number {
-    let rotationAngle = (dbToConvert + 20) * (350 / 25) + KNOB_STARTING_ANGLE;
-
-    // TODO: refactor clamp for UI tmrow
-    if (rotationAngle < 10) {
-      return (rotationAngle = 10);
-    } else if (rotationAngle > 270) {
-      return (rotationAngle = 270);
-    } else {
-      return rotationAngle;
-    }
+  function getKnobRotation(newAngle: number): number {
+    return (newAngle + 20) * (350 / 25) + KNOB_STARTING_ANGLE;
   }
 
   function getDbFromRotation(rotationAngle: number, startingAngle: number) {
     const dbValue = (rotationAngle - startingAngle) / (350 / 25) - 20;
+    console.log(
+      "dbValue: ",
+      dbValue,
+      "rotationAngle: ",
+      rotationAngle,
+      "startingAngle: ",
+      startingAngle,
+    );
 
     return dbValue;
   }

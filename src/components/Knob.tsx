@@ -9,11 +9,23 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
   const knobLineOffset = -130;
   const renderKnob = rotationAngle + knobLineOffset;
+  const maxKnobVal = 270;
+  const minKnobVal = 10;
+
   console.log("Rotation Angle:", rotationAngle);
 
   useEffect(() => {
     function handleWindowMouseMove(event: MouseEvent) {
-      const newAngle = rotationAngle + event.movementY;
+      let newAngle = 0;
+
+      if (rotationAngle > maxKnobVal && event.movementY > 0) {
+        newAngle = maxKnobVal;
+      } else if (rotationAngle <= minKnobVal && event.movementY <= 0) {
+        newAngle = minKnobVal;
+      } else {
+        newAngle = rotationAngle + event.movementY;
+      }
+
       onDrag(newAngle);
     }
 
