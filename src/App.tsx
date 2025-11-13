@@ -328,6 +328,7 @@ function App() {
     }
   }, [loadedCount]);
 
+  // get dB value from rotation of volume knob
   useEffect(() => {
     const dbValue = getDbFromRotation(knobAngle); // update audio
 
