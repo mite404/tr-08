@@ -13,7 +13,7 @@ export function Pad({
   is16thNote,
   onClick,
 }: PadProps) {
-  console.log("current step:", isCurrentStep);
+  // console.log("current step:", isCurrentStep);
 
   return (
     <button

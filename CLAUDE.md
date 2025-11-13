@@ -38,6 +38,7 @@ grid[trackIndex][stepIndex] = boolean
 - `true` = sound plays at this step, `false` = silent
 
 **Audio Players:**
+
 - Each track has a `player` property (Tone.Player instance) added dynamically
 - Players are initialized on first play (lazy loading) via `initPlayers()` function
 - Loading state prevents playback until all samples are loaded (or allows continuation if some fail)
@@ -73,6 +74,7 @@ import Bh_Hit_Hihat_0009 from "./assets/samples/Bh_Hit_Hihat_0009.wav";
 ```
 
 **Benefits:**
+
 - Vite bundles samples into production build
 - No network requests needed in production
 - Reliable for deployed applications
@@ -120,6 +122,7 @@ Users can customize the beat name (Commit #18):
 - Name persists in component state during session
 
 **Implementation:**
+
 ```typescript
 const [beatName, setBeatName] = useState("TR-08");
 const [isEditTitleActive, setIsEditTitleActive] = useState(false);

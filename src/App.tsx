@@ -18,12 +18,13 @@ import KICK01 from "./assets/samples/KICK01.wav";
 import KICK02 from "./assets/samples/KICK02.wav";
 import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
 import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
+import { Knob } from "./components/Knob";
 
 export type TrackObject = {
   name: string;
   sound: string;
   color: string;
-  player?: Tone.Player | undefined; // tone.js Player instance added on initialization of Players
+  player?: Tone.Player; // tone.js Player instance added on initialization of Players
 };
 
 const initialGrid = [
@@ -209,7 +210,7 @@ const initialGrid = [
   ], // track 9
 ];
 
-const tracks = [
+const tracks: Array<TrackObject> = [
   {
     name: "KICK 01",
     sound: KICK01,
@@ -286,6 +287,11 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [beatName, setBeatName] = useState("TR-08");
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
+  const KNOB_STARTING_ANGLE = 320; // -5dB starting knob position in degrees
+  const initialVolumeDb = -5;
+  const [knobAngle, setKnobAngle] = useState(() =>
+    getKnobRotation(initialVolumeDb),
+  );
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -308,8 +314,8 @@ function App() {
     createSequencerRef.current = sequencer;
 
     return () => {
-      sequencer.dispose();
-      createSequencerRef.current = null;
+      sequencer.dispose(); // clear upcoming transport scheduled events, prep sequencer obj for deletion
+      createSequencerRef.current = null; // unalive sequencer reference object
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -321,6 +327,17 @@ function App() {
       console.log("loadedCount:", loadedCount);
     }
   }, [loadedCount]);
+
+  // get dB value from rotation of volume knob
+  useEffect(() => {
+    const dbValue = getDbFromRotation(knobAngle); // update audio
+
+    if (tracks[8].player) {
+      tracks[8].player.volume.value = dbValue;
+    } else {
+      console.log("Player object hasn't been created for this track yet!");
+    }
+  }, [knobAngle]);
 
   function initPlayers(
     tracks: Array<TrackObject>,
@@ -445,6 +462,35 @@ function App() {
     }
   }
 
+  function handleKnobValueChange(newAngleFromKnob: number) {
+    setKnobAngle(newAngleFromKnob); // update knob angle state
+  }
+
+  function getKnobRotation(newAngle: number): number {
+    return (newAngle + 20) * (350 / 25) + KNOB_STARTING_ANGLE;
+  }
+
+  function getDbFromRotation(rotationAngle: number) {
+    // const dbValue = (rotationAngle - startingAngle) / (350 / 25) - 20;
+
+    // in degrees
+    const inputMin = 10;
+    const inputMax = 256;
+
+    // in dBs
+    const outputMax = 5;
+    const outputMin = -25;
+
+    const dbValue =
+      ((rotationAngle - inputMin) / (inputMax - inputMin)) *
+        (outputMax - outputMin) +
+      outputMin;
+
+    console.log("dbValue: ", dbValue, "rotationAngle: ", rotationAngle);
+
+    return dbValue;
+  }
+
   return (
     // whole page container
     <div className="flex min-h-screen items-center justify-center bg-gray-950">
@@ -496,6 +542,7 @@ function App() {
               onDecrementClick={handleDecrementBpm}
             />
           </div>
+          <Knob rotationAngle={knobAngle} onDrag={handleKnobValueChange} />
         </div>
       </div>
     </div>
