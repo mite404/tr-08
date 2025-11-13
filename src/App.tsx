@@ -24,7 +24,7 @@ export type TrackObject = {
   name: string;
   sound: string;
   color: string;
-  player?: Tone.Player | undefined; // tone.js Player instance added on initialization of Players
+  player?: Tone.Player; // tone.js Player instance added on initialization of Players
 };
 
 const initialGrid = [
@@ -210,7 +210,7 @@ const initialGrid = [
   ], // track 9
 ];
 
-const tracks = [
+const tracks: Array<TrackObject> = [
   {
     name: "KICK 01",
     sound: KICK01,
@@ -327,6 +327,16 @@ function App() {
       console.log("loadedCount:", loadedCount);
     }
   }, [loadedCount]);
+
+  useEffect(() => {
+    const dbValue = getDbFromRotation(knobAngle); // update audio
+
+    if (tracks[8].player) {
+      tracks[8].player.volume.value = dbValue;
+    } else {
+      console.log("Player object hasn't been created for this track yet!");
+    }
+  }, [knobAngle]);
 
   function initPlayers(
     tracks: Array<TrackObject>,
@@ -453,7 +463,6 @@ function App() {
 
   function handleKnobValueChange(newAngleFromKnob: number) {
     setKnobAngle(newAngleFromKnob); // update knob angle state
-    getDbFromRotation(newAngleFromKnob); // update audio
   }
 
   function getKnobRotation(newAngle: number): number {

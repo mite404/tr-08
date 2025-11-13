@@ -12,6 +12,10 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
   const maxKnobVal = 256;
   const minKnobVal = 10;
 
+  function handleMouseDown() {
+    setIsDragging(true);
+  }
+
   useEffect(() => {
     function handleWindowMouseMove(event: MouseEvent) {
       let newAngle = rotationAngle + event.movementY;
@@ -23,7 +27,7 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
         newAngle = minKnobVal;
       }
 
-      onDrag(newAngle);
+      onDrag(newAngle); // fires handleKnobValueChange for component prop
     }
 
     function handleWindowMouseUp() {
@@ -40,10 +44,6 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
       window.removeEventListener("mouseup", handleWindowMouseUp);
     };
   }, [isDragging, onDrag, rotationAngle]); // rotationAngle needed to be added for fresh value
-
-  function handleMouseDown() {
-    setIsDragging(true);
-  }
 
   return (
     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-900">
