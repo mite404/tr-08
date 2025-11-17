@@ -289,7 +289,8 @@ function App() {
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
   // const KNOB_STARTING_ANGLE = 320; // -5dB starting knob position in degrees
   const initialVolumeDb = -5;
-  const [volume, setVolumeDb] = useState(initialVolumeDb);
+  // const [volume, setVolumeDb] = useState(initialVolumeDb);
+  const [trackVolumes, setTrackVolumes] = useState(Array(10).fill(-5));
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -449,21 +450,19 @@ function App() {
     }
   }
 
-  function handleDbChange(newDbValue: number) {
+  function handleDbChange(trackIndex: number, newDbValue: number) {
     console.log("Volume updated to:", newDbValue);
-    setVolumeDb(newDbValue);
-
-    // if (tracks[8].player) {
-    //   tracks[8].player.volume.value = newDbValue;
-    // }
+    setTrackVolumes((prev) => {
+      const updated = [...prev];
+      updated[trackIndex] = newDbValue;
+      return updated;
+    });
 
     // update audio player
-    for (const track of tracks) {
-      if (track.player) {
-        track.player.volume.value = newDbValue;
-      } else {
-        console.log("Player object hasn't been created for this track yet!");
-      }
+    if (tracks[trackIndex].player) {
+      tracks[trackIndex].player.volume.value = newDbValue;
+    } else {
+      console.log("Player object hasn't been created for this track yet!");
     }
   }
 
@@ -479,8 +478,17 @@ function App() {
         </div>
         {/* KNOB container */}
         <div>
-          {grid.map((track, rowIndex) => {
-            <Knob inputDb={volume} onDbChange={handleDbChange} />;
+          {tracks.map((track, trackIndex) => {
+            return (
+              <Knob
+                key={trackIndex}
+                trackIndex={trackIndex}
+                inputDb={trackVolumes[trackIndex]}
+                onDbChange={(newDbValue) => {
+                  handleDbChange(trackIndex, newDbValue);
+                }}
+              />
+            );
           })}
         </div>
         {/* beat grid container */}
