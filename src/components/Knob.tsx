@@ -1,16 +1,42 @@
 import { useState, useEffect } from "react";
 
 type KnobProps = {
-  rotationAngle: number;
-  onDrag: (newAngle: number) => void;
+  inputDb: number;
+  onDbChange: (newDbValue: number) => void;
 };
 
-export function Knob({ rotationAngle, onDrag }: KnobProps) {
+// conversion constants
+// const KNOB_STARTING_ANGLE = 320; // -5dB starting position
+const MIN_ROTATION_ANGLE = 10;
+const MAX_ROTATION_ANGLE = 256;
+const MIN_DB = -25;
+const MAX_DB = 5;
+const KNOB_LINE_OFFSET = -130;
+
+// convert input dB level to rotation angle
+function getAngleFromDb(dbValue: number): number {
+  return (
+    ((dbValue - MIN_DB) / (MAX_DB - MIN_DB)) *
+      (MAX_ROTATION_ANGLE - MIN_ROTATION_ANGLE) +
+    MIN_ROTATION_ANGLE
+  );
+}
+
+// convert input angle to dB level
+function getDbFromAngle(angleValue: number): number {
+  return (
+    ((angleValue - MIN_ROTATION_ANGLE) /
+      (MAX_ROTATION_ANGLE - MIN_ROTATION_ANGLE)) *
+      (MAX_DB - MIN_DB) +
+    MIN_DB
+  );
+}
+
+export function Knob({ inputDb, onDbChange }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const knobLineOffset = -130;
-  const renderKnob = rotationAngle + knobLineOffset;
-  const maxKnobVal = 256;
-  const minKnobVal = 10;
+
+  const rotationAngle = getAngleFromDb(inputDb);
+  const renderKnob = rotationAngle + KNOB_LINE_OFFSET;
 
   function handleMouseDown() {
     setIsDragging(true);
@@ -18,16 +44,21 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
 
   useEffect(() => {
     function handleWindowMouseMove(event: MouseEvent) {
+      // allows new angle with full movement unclamped
       let newAngle = rotationAngle + event.movementY;
 
       // possible oneliner solution: newAngle = Math.max(10, Math.min(270, newAngle))
-      if (newAngle > maxKnobVal) {
-        newAngle = maxKnobVal;
-      } else if (newAngle < minKnobVal) {
-        newAngle = minKnobVal;
+      if (newAngle > MAX_ROTATION_ANGLE) {
+        newAngle = MAX_ROTATION_ANGLE;
+      } else if (newAngle < MIN_ROTATION_ANGLE) {
+        newAngle = MIN_ROTATION_ANGLE;
       }
 
-      onDrag(newAngle); // fires handleKnobValueChange for component prop
+      // convert clamped angle back to dB
+      const newDb = getDbFromAngle(newAngle);
+      // console.log("dbValue: ", newDb, "rotationAngle: ", newAngle);
+
+      onDbChange(newDb); // 🔥 Fires repeatedly during drag
     }
 
     function handleWindowMouseUp() {
@@ -43,7 +74,7 @@ export function Knob({ rotationAngle, onDrag }: KnobProps) {
       window.removeEventListener("mousemove", handleWindowMouseMove);
       window.removeEventListener("mouseup", handleWindowMouseUp);
     };
-  }, [isDragging, onDrag, rotationAngle]); // rotationAngle needed to be added for fresh value
+  }, [isDragging, rotationAngle, onDbChange]); // rotationAngle needed to be added for fresh value
 
   return (
     <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-900">
