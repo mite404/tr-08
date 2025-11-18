@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 type KnobProps = {
-  trackIndex: number;
+  _trackIndex: number;
   inputDb: number;
   onDbChange: (newDbValue: number) => void;
 };
@@ -33,8 +33,8 @@ function getDbFromAngle(angleValue: number): number {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function Knob({ trackIndex, inputDb, onDbChange }: KnobProps) {
+// @ts-expect-error _trackIndex is intentionally unused for semantic clarity
+export function Knob({ _trackIndex, inputDb, onDbChange }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   const rotationAngle = getAngleFromDb(inputDb);

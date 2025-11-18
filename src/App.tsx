@@ -485,7 +485,7 @@ function App() {
                 <Knob
                   // eslint-disable-next-line react-x/no-array-index-key
                   key={trackIndex}
-                  trackIndex={trackIndex}
+                  _trackIndex={trackIndex}
                   inputDb={trackVolumes[trackIndex]}
                   onDbChange={(newDbValue) => {
                     handleDbChange(trackIndex, newDbValue);
