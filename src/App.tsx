@@ -287,9 +287,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [beatName, setBeatName] = useState("TR-08");
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
-  // const KNOB_STARTING_ANGLE = 320; // -5dB starting knob position in degrees
-  const initialVolumeDb = -5;
-  // const [volume, setVolumeDb] = useState(initialVolumeDb);
   const [trackVolumes, setTrackVolumes] = useState(Array(10).fill(-5));
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
@@ -521,7 +518,7 @@ function App() {
         </div>
 
         {/* control buttons container */}
-        <div className="grid grid-cols-2 gap-2 p-6 pt-6">
+        <div className="mx-auto grid max-w-3/4 grid-cols-2 justify-center gap-2 p-6 pt-6">
           <div>
             <PlayStopBtn
               customStyles=""
