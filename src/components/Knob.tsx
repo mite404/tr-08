@@ -46,7 +46,7 @@ export function Knob({ trackIndex, inputDb, onDbChange }: KnobProps) {
   useEffect(() => {
     function handleWindowMouseMove(event: MouseEvent) {
       // allows new angle with full movement unclamped
-      let newAngle = rotationAngle + event.movementY;
+      let newAngle = rotationAngle - event.movementY;
 
       // possible oneliner solution: newAngle = Math.max(10, Math.min(270, newAngle))
       if (newAngle > MAX_ROTATION_ANGLE) {
