@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 type KnobProps = {
+  trackIndex: number;
   inputDb: number;
   onDbChange: (newDbValue: number) => void;
 };
@@ -32,7 +33,7 @@ function getDbFromAngle(angleValue: number): number {
   );
 }
 
-export function Knob({ inputDb, onDbChange }: KnobProps) {
+export function Knob({ trackIndex, inputDb, onDbChange }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   const rotationAngle = getAngleFromDb(inputDb);
@@ -77,13 +78,16 @@ export function Knob({ inputDb, onDbChange }: KnobProps) {
   }, [isDragging, rotationAngle, onDbChange]); // rotationAngle needed to be added for fresh value
 
   return (
-    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-900">
-      <div
-        className="flex h-10 w-10 cursor-pointer justify-center rounded-full bg-amber-500"
-        style={{ transform: `rotate(${renderKnob}deg)` }}
-        onMouseDown={handleMouseDown}
-      >
-        <div className="h-4 w-2 bg-black"></div>
+    <div className="pb-1">
+      <div className="flex h-[25px] w-[25px] items-center justify-center rounded-full bg-gray-900">
+        <div
+          className="flex h-[20px] w-[20px] cursor-pointer justify-center rounded-full bg-amber-500"
+          style={{ transform: `rotate(${renderKnob}deg)` }}
+          onMouseDown={handleMouseDown}
+        >
+          {/* black line on knob */}
+          <div className="h-2 w-1 bg-black"></div>
+        </div>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { Pad } from "./components/Pad";
 import { PlayStopBtn } from "./components/PlayStopBtn";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
+import { Knob } from "./components/Knob";
 
 // Import all audio samples directly so Vite bundles them correctly for production
 import BASS01 from "./assets/samples/BASS01.wav";
@@ -18,7 +19,6 @@ import KICK01 from "./assets/samples/KICK01.wav";
 import KICK02 from "./assets/samples/KICK02.wav";
 import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
 import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
-import { Knob } from "./components/Knob";
 
 export type TrackObject = {
   name: string;
@@ -287,9 +287,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [beatName, setBeatName] = useState("TR-08");
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
-  // const KNOB_STARTING_ANGLE = 320; // -5dB starting knob position in degrees
-  const initialVolumeDb = -5;
-  const [volume, setVolumeDb] = useState(initialVolumeDb);
+  const [trackVolumes, setTrackVolumes] = useState(Array(10).fill(-5));
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -449,21 +447,19 @@ function App() {
     }
   }
 
-  function handleDbChange(newDbValue: number) {
-    console.log("Volume updated to:", newDbValue);
-    setVolumeDb(newDbValue);
-
-    // if (tracks[8].player) {
-    //   tracks[8].player.volume.value = newDbValue;
-    // }
+  function handleDbChange(trackIndex: number, newDbValue: number) {
+    console.log(`Volume for track ${trackIndex} updated to:`, newDbValue);
+    setTrackVolumes((prev) => {
+      const updated = [...prev];
+      updated[trackIndex] = newDbValue;
+      return updated;
+    });
 
     // update audio player
-    for (const track of tracks) {
-      if (track.player) {
-        track.player.volume.value = newDbValue;
-      } else {
-        console.log("Player object hasn't been created for this track yet!");
-      }
+    if (tracks[trackIndex].player) {
+      tracks[trackIndex].player.volume.value = newDbValue;
+    } else {
+      console.log("Player object hasn't been created for this track yet!");
     }
   }
 
@@ -477,45 +473,60 @@ function App() {
           <img className="w-[200px] p-6" src={mpcMark} alt="TR-08 Mark"></img>
           {getDisplayTitle()}
         </div>
-        {/* KNOB container */}
-        <div>
-          {grid.map((track, rowIndex) => {
-            <Knob inputDb={volume} onDbChange={handleDbChange} />;
-          })}
-        </div>
-        {/* beat grid container */}
-        <div className="rounded-md border-10 border-gray-900">
-          {/* beat grid */}
-          <div className="grid grid-cols-16 gap-1 p-0.5">
-            {grid.map((track, rowIndex) => {
-              return track.map((_, colIndex) => {
-                return (
-                  <Pad
-                    // eslint-disable-next-line react-x/no-array-index-key
-                    key={`${rowIndex}-${colIndex}`}
-                    color={getActiveColor(
-                      tracks[rowIndex].color,
-                      grid[rowIndex][colIndex],
-                    )}
-                    isActive={grid[rowIndex][colIndex]}
-                    isCurrentStep={colIndex === currentStep}
-                    is16thNote={colIndex % 4 !== 0}
-                    onClick={() => handlePadClick(rowIndex, colIndex)}
-                  />
-                );
-              });
+
+        {/* container for KNOB & GRID divs */}
+        <div className="flex w-full flex-row">
+          {/* KNOB container */}
+          <div className="flex-none pt-3.5 pr-1.5">
+            {tracks.map((track, trackIndex) => {
+              return (
+                <Knob
+                  key={trackIndex}
+                  trackIndex={trackIndex}
+                  inputDb={trackVolumes[trackIndex]}
+                  onDbChange={(newDbValue) => {
+                    handleDbChange(trackIndex, newDbValue);
+                  }}
+                />
+              );
             })}
           </div>
+          {/* beat grid container */}
+          <div className="flex-1 rounded-md border-10 border-gray-900">
+            {/* beat grid */}
+            <div className="grid grid-cols-16 gap-1 p-0.5">
+              {grid.map((track, rowIndex) => {
+                return track.map((_, colIndex) => {
+                  return (
+                    <Pad
+                      // eslint-disable-next-line react-x/no-array-index-key
+                      key={`${rowIndex}-${colIndex}`}
+                      color={getActiveColor(
+                        tracks[rowIndex].color,
+                        grid[rowIndex][colIndex],
+                      )}
+                      isActive={grid[rowIndex][colIndex]}
+                      isCurrentStep={colIndex === currentStep}
+                      is16thNote={colIndex % 4 !== 0}
+                      onClick={() => handlePadClick(rowIndex, colIndex)}
+                    />
+                  );
+                });
+              })}
+            </div>
+          </div>
         </div>
+
         {/* control buttons container */}
-        <div className="grid grid-cols-2 gap-2 p-6 pt-6">
-          <div className="">
+        <div className="mx-auto grid max-w-3/4 grid-cols-2 justify-center gap-2 p-6 pt-6">
+          <div>
             <PlayStopBtn
               customStyles=""
               onClick={handleStartStopClick}
               disabled={isLoading}
             />
           </div>
+
           {/* set tempo controls container */}
           <div className="grid grid-cols-1">
             <TempoDisplay
