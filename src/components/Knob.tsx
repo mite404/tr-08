@@ -34,6 +34,7 @@ function getDbFromAngle(angleValue: number): number {
 }
 
 // @ts-expect-error _trackIndex is intentionally unused for semantic clarity
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function Knob({ _trackIndex, inputDb, onDbChange }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
 
