@@ -6,6 +6,7 @@ import { Pad } from "./components/Pad";
 import { PlayStopBtn } from "./components/PlayStopBtn";
 import { TempoDisplay } from "./components/TempoDisplay";
 import { createSequencer, togglePad } from "./sequencer";
+import { Knob } from "./components/Knob";
 
 // Import all audio samples directly so Vite bundles them correctly for production
 import BASS01 from "./assets/samples/BASS01.wav";
@@ -18,7 +19,6 @@ import KICK01 from "./assets/samples/KICK01.wav";
 import KICK02 from "./assets/samples/KICK02.wav";
 import StabsChords016Dm from "./assets/samples/Stabs_&_Chords_016_Dm.wav";
 import StabsChords028C from "./assets/samples/Stabs_&_Chords_028_C.wav";
-import { Knob } from "./components/Knob";
 
 export type TrackObject = {
   name: string;
@@ -451,7 +451,7 @@ function App() {
   }
 
   function handleDbChange(trackIndex: number, newDbValue: number) {
-    console.log("Volume updated to:", newDbValue);
+    console.log(`Volume for track ${trackIndex} updated to:`, newDbValue);
     setTrackVolumes((prev) => {
       const updated = [...prev];
       updated[trackIndex] = newDbValue;
@@ -476,54 +476,60 @@ function App() {
           <img className="w-[200px] p-6" src={mpcMark} alt="TR-08 Mark"></img>
           {getDisplayTitle()}
         </div>
-        {/* KNOB container */}
-        <div>
-          {tracks.map((track, trackIndex) => {
-            return (
-              <Knob
-                key={trackIndex}
-                trackIndex={trackIndex}
-                inputDb={trackVolumes[trackIndex]}
-                onDbChange={(newDbValue) => {
-                  handleDbChange(trackIndex, newDbValue);
-                }}
-              />
-            );
-          })}
-        </div>
-        {/* beat grid container */}
-        <div className="rounded-md border-10 border-gray-900">
-          {/* beat grid */}
-          <div className="grid grid-cols-16 gap-1 p-0.5">
-            {grid.map((track, rowIndex) => {
-              return track.map((_, colIndex) => {
-                return (
-                  <Pad
-                    // eslint-disable-next-line react-x/no-array-index-key
-                    key={`${rowIndex}-${colIndex}`}
-                    color={getActiveColor(
-                      tracks[rowIndex].color,
-                      grid[rowIndex][colIndex],
-                    )}
-                    isActive={grid[rowIndex][colIndex]}
-                    isCurrentStep={colIndex === currentStep}
-                    is16thNote={colIndex % 4 !== 0}
-                    onClick={() => handlePadClick(rowIndex, colIndex)}
-                  />
-                );
-              });
+
+        {/* container for KNOB & GRID divs */}
+        <div className="flex w-full flex-row">
+          {/* KNOB container */}
+          <div className="flex-none pt-3.5 pr-1.5">
+            {tracks.map((track, trackIndex) => {
+              return (
+                <Knob
+                  key={trackIndex}
+                  trackIndex={trackIndex}
+                  inputDb={trackVolumes[trackIndex]}
+                  onDbChange={(newDbValue) => {
+                    handleDbChange(trackIndex, newDbValue);
+                  }}
+                />
+              );
             })}
           </div>
+          {/* beat grid container */}
+          <div className="flex-1 rounded-md border-10 border-gray-900">
+            {/* beat grid */}
+            <div className="grid grid-cols-16 gap-1 p-0.5">
+              {grid.map((track, rowIndex) => {
+                return track.map((_, colIndex) => {
+                  return (
+                    <Pad
+                      // eslint-disable-next-line react-x/no-array-index-key
+                      key={`${rowIndex}-${colIndex}`}
+                      color={getActiveColor(
+                        tracks[rowIndex].color,
+                        grid[rowIndex][colIndex],
+                      )}
+                      isActive={grid[rowIndex][colIndex]}
+                      isCurrentStep={colIndex === currentStep}
+                      is16thNote={colIndex % 4 !== 0}
+                      onClick={() => handlePadClick(rowIndex, colIndex)}
+                    />
+                  );
+                });
+              })}
+            </div>
+          </div>
         </div>
+
         {/* control buttons container */}
         <div className="grid grid-cols-2 gap-2 p-6 pt-6">
-          <div className="">
+          <div>
             <PlayStopBtn
               customStyles=""
               onClick={handleStartStopClick}
               disabled={isLoading}
             />
           </div>
+
           {/* set tempo controls container */}
           <div className="grid grid-cols-1">
             <TempoDisplay
