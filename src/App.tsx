@@ -287,7 +287,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [beatName, setBeatName] = useState("TR-08");
   const [isEditTitleActive, setIsEditTitleActive] = useState(false);
-  const [trackVolumes, setTrackVolumes] = useState(Array(10).fill(-5));
+  const [trackVolumes, setTrackVolumes] = useState<number[]>(
+    Array(10).fill(-5),
+  );
   const createSequencerRef = useRef<ReturnType<typeof createSequencer>>(null);
   const gridRef = useRef(grid);
   const playersInitializedRef = useRef(false);
@@ -481,6 +483,7 @@ function App() {
             {tracks.map((track, trackIndex) => {
               return (
                 <Knob
+                  // eslint-disable-next-line react-x/no-array-index-key
                   key={trackIndex}
                   trackIndex={trackIndex}
                   inputDb={trackVolumes[trackIndex]}

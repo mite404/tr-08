@@ -33,7 +33,8 @@ function getDbFromAngle(angleValue: number): number {
   );
 }
 
-export function Knob({ trackIndex, inputDb, onDbChange }: KnobProps) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function Knob({ _trackIndex, inputDb, onDbChange }: KnobProps) {
   const [isDragging, setIsDragging] = useState(false);
 
   const rotationAngle = getAngleFromDb(inputDb);
