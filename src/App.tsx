@@ -480,7 +480,7 @@ function App() {
         <div className="flex w-full flex-row">
           {/* KNOB container */}
           <div className="flex-none pt-3.5 pr-1.5">
-            {tracks.map((track, trackIndex) => {
+            {tracks.map((_track, trackIndex) => {
               return (
                 <Knob
                   // eslint-disable-next-line react-x/no-array-index-key
