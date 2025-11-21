@@ -32,7 +32,6 @@ export default defineConfig([
   {
     files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
     plugins: {
-      jest,
       "testing-library": testingLibrary,
     },
     extends: [testingLibrary.configs.react],
