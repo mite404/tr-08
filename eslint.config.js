@@ -6,6 +6,7 @@ import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 import reactX from "eslint-plugin-react-x";
 import reactDom from "eslint-plugin-react-dom";
+import testingLibrary from "eslint-plugin-testing-library";
 
 export default defineConfig([
   globalIgnores(["dist"]),
@@ -25,6 +26,19 @@ export default defineConfig([
       parserOptions: {
         project: ["./tsconfig.node.json", "./tsconfig.app.json"],
         tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+  {
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+    plugins: {
+      jest,
+      "testing-library": testingLibrary,
+    },
+    extends: [testingLibrary.configs.react],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
       },
     },
   },

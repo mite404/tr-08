@@ -15,7 +15,7 @@ const MAX_DB = 5;
 const KNOB_LINE_OFFSET = -130;
 
 // convert input dB level to rotation angle
-function getAngleFromDb(dbValue: number): number {
+export function getAngleFromDb(dbValue: number): number {
   return (
     ((dbValue - MIN_DB) / (MAX_DB - MIN_DB)) *
       (MAX_ROTATION_ANGLE - MIN_ROTATION_ANGLE) +
@@ -24,7 +24,7 @@ function getAngleFromDb(dbValue: number): number {
 }
 
 // convert input angle to dB level
-function getDbFromAngle(angleValue: number): number {
+export function getDbFromAngle(angleValue: number): number {
   return (
     ((angleValue - MIN_ROTATION_ANGLE) /
       (MAX_ROTATION_ANGLE - MIN_ROTATION_ANGLE)) *
