@@ -12,6 +12,7 @@ export default defineConfig([
   globalIgnores(["dist"]),
   {
     files: ["**/*.{ts,tsx}"],
+    ignores: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommendedTypeChecked,
@@ -34,11 +35,12 @@ export default defineConfig([
     plugins: {
       "testing-library": testingLibrary,
     },
-    extends: [testingLibrary.configs.react],
+    rules: {
+      ...testingLibrary.configs.react.rules,
+    },
     languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
   },
 ]);
