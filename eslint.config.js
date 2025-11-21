@@ -6,11 +6,13 @@ import tseslint from "typescript-eslint";
 import { defineConfig, globalIgnores } from "eslint/config";
 import reactX from "eslint-plugin-react-x";
 import reactDom from "eslint-plugin-react-dom";
+import testingLibrary from "eslint-plugin-testing-library";
 
 export default defineConfig([
   globalIgnores(["dist"]),
   {
     files: ["**/*.{ts,tsx}"],
+    ignores: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommendedTypeChecked,
@@ -26,6 +28,19 @@ export default defineConfig([
         project: ["./tsconfig.node.json", "./tsconfig.app.json"],
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+  },
+  {
+    files: ["**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}"],
+    plugins: {
+      "testing-library": testingLibrary,
+    },
+    rules: {
+      ...testingLibrary.configs.react.rules,
+    },
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
     },
   },
 ]);
